@@ -7,6 +7,7 @@
 Sitio web corporativo moderno para **Asoantioquia**, una empresa líder en gestión integral de residuos y economía circular en Colombia. El sitio está diseñado para comunicar efectivamente el propósito, servicios e impacto social de la organización.
 
 ### 🎯 Objetivos Principales
+
 - Presentar los servicios de gestión de residuos de manera atractiva
 - Mostrar el impacto social y ambiental de la empresa
 - Facilitar el contacto con potenciales clientes y aliados
@@ -15,6 +16,7 @@ Sitio web corporativo moderno para **Asoantioquia**, una empresa líder en gesti
 ## 🚀 Tecnologías Utilizadas
 
 ### Frontend
+
 - **React 18** - Biblioteca principal para la interfaz de usuario
 - **TypeScript** - Tipado estático para mayor robustez
 - **Tailwind CSS** - Framework de CSS utilitario para diseño moderno
@@ -22,14 +24,17 @@ Sitio web corporativo moderno para **Asoantioquia**, una empresa líder en gesti
 - **TanStack Router** - Enrutamiento moderno y tipado
 
 ### Mapas y Geolocalización
+
 - **Leaflet** - Mapas interactivos para mostrar ubicaciones
 - **React Leaflet** - Integración de Leaflet con React
 
 ### Formularios y Validación
+
 - **React Hook Form** - Manejo eficiente de formularios
 - **Validación integrada** - Validación en tiempo real
 
 ### Herramientas de Desarrollo
+
 - **Vite** - Bundler rápido y moderno
 - **ESLint** - Linting de código
 - **PostCSS** - Procesamiento de CSS
@@ -69,18 +74,21 @@ src/
 ## 🎨 Características de Diseño
 
 ### Diseño Moderno y Responsivo
+
 - **Mobile-first** - Optimizado para dispositivos móviles
 - **Diseño adaptativo** - Se ajusta a todas las pantallas
 - **Animaciones sutiles** - Mejoran la experiencia del usuario
 - **Micro-interacciones** - Feedback visual en hover y click
 
 ### Elementos Visuales Destacados
+
 - **Partículas flotantes** - Elementos decorativos animados
 - **Gradientes dinámicos** - Colores que reflejan la marca
 - **Efectos de profundidad** - Sombras y elevaciones modernas
 - **Tipografía jerárquica** - Lectura clara y organizada
 
 ### Paleta de Colores
+
 - **Verde principal**: `#10b981` (Sostenibilidad)
 - **Verde secundario**: `#059669` (Naturaleza)
 - **Azul**: `#3b82f6` (Confianza)
@@ -90,6 +98,7 @@ src/
 ## 🗺️ Navegación del Sitio
 
 ### Menú Principal
+
 - **Inicio** - Landing page con hero y secciones principales
 - **¿Quiénes somos?** (Dropdown)
   - Misión y Visión
@@ -100,6 +109,7 @@ src/
 - **Contacto** - Formularios y información de contacto
 
 ### Secciones de la Página Principal
+
 1. **Hero Section** - Slider con mensajes principales
 2. **Servicios** - Tarjetas de servicios principales
 3. **Aliados Estratégicos** - Empresas partner
@@ -111,33 +121,39 @@ src/
 ## 🛠️ Instalación y Configuración
 
 ### Prerrequisitos
-- Node.js 18+ 
+
+- Node.js 18+
 - npm, yarn o pnpm
 
 ### Pasos de Instalación
 
 1. **Clonar el repositorio**
+
 ```bash
 git clone [url-del-repositorio]
 cd asoantioquia-website
 ```
 
 2. **Instalar dependencias**
+
 ```bash
 npm install
 ```
 
 3. **Ejecutar en modo desarrollo**
+
 ```bash
 npm run dev
 ```
 
 4. **Construir para producción**
+
 ```bash
 npm run build
 ```
 
 5. **Previsualizar build de producción**
+
 ```bash
 npm run preview
 ```
@@ -145,34 +161,40 @@ npm run preview
 ## 📊 Datos y Contenido
 
 ### Servicios Principales
+
 - **Recolección Especializada** - Servicio puerta a puerta
 - **Clasificación y Procesamiento** - Tecnología avanzada
 - **Capacitación Ambiental** - Programas educativos
 - **Consultoría Sostenible** - Asesoría especializada
 
 ### Métricas de Impacto
+
 - **12,500+** toneladas recicladas
 - **450+** empleos creados
 - **85+** empresas aliadas
 - **25** comunidades beneficiadas
 
 ### Ubicaciones
+
 - **Sede Principal**: Montería, Córdoba
 - **Sede Secundaria**: Turbo, Antioquia
 
 ## 🎯 Funcionalidades Principales
 
 ### Formularios Inteligentes
+
 - **Validación en tiempo real** - Feedback inmediato
 - **Formularios específicos** - General y para empresas
 - **Campos condicionales** - Se adaptan al tipo de usuario
 
 ### Mapas Interactivos
+
 - **Leaflet integration** - Mapas reales y funcionales
 - **Marcadores personalizados** - Información de cada sede
 - **Controles intuitivos** - Zoom y navegación fácil
 
 ### Animaciones y Efectos
+
 - **Framer Motion** - Animaciones fluidas
 - **Scroll animations** - Elementos aparecen al hacer scroll
 - **Hover effects** - Feedback visual en interacciones
@@ -181,14 +203,17 @@ npm run preview
 ## 🔧 Personalización
 
 ### Modificar Colores
+
 Los colores principales se definen en `tailwind.config.js` y se pueden personalizar fácilmente.
 
 ### Agregar Contenido
+
 - **Servicios**: Modificar `src/services/mockData.ts`
 - **Noticias**: Actualizar array de noticias en mockData
 - **Ubicaciones**: Agregar nuevas coordenadas y datos
 
 ### Cambiar Imágenes
+
 - **Logo**: Reemplazar en `public/LOGO ASOANTIOQUIA-02.png`
 - **Hero images**: URLs en `heroSlides` array
 - **Sección images**: URLs de Pexels en mockData
@@ -196,6 +221,7 @@ Los colores principales se definen en `tailwind.config.js` y se pueden personali
 ## 📱 Responsividad
 
 El sitio está optimizado para:
+
 - **Móviles**: 320px - 768px
 - **Tablets**: 768px - 1024px
 - **Desktop**: 1024px+
@@ -204,11 +230,13 @@ El sitio está optimizado para:
 ## 🚀 Optimizaciones
 
 ### Performance
+
 - **Lazy loading** - Imágenes se cargan según necesidad
 - **Code splitting** - Carga optimizada de componentes
 - **Optimized images** - Compresión automática
 
 ### SEO
+
 - **Meta tags** - Títulos y descripciones optimizadas
 - **Semantic HTML** - Estructura semántica correcta
 - **Alt texts** - Descripciones de imágenes
@@ -216,12 +244,14 @@ El sitio está optimizado para:
 ## 🤝 Contribución
 
 ### Guías de Estilo
+
 - Usar TypeScript para tipado
 - Seguir convenciones de naming de React
 - Mantener componentes pequeños y reutilizables
 - Documentar funciones complejas
 
 ### Proceso de Desarrollo
+
 1. Crear branch para nueva feature
 2. Desarrollar y probar localmente
 3. Hacer commit con mensajes descriptivos
@@ -231,8 +261,8 @@ El sitio está optimizado para:
 
 Para soporte técnico o consultas sobre el proyecto:
 
-- **Email**: desarrollo@asoantioquia.org
-- **Teléfono**: +57 (4) 789-1234
+- **Email**: sricardodev@gmail.com
+- **Teléfono**: +57 310 665 1486
 - **Ubicación**: Montería, Córdoba, Colombia
 
 ## 📄 Licencia
@@ -243,4 +273,4 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 **Desarrollado con ❤️ para Asoantioquia**
 
-*Transformando residuos en oportunidades desde 2024*
+_Transformando residuos en oportunidades desde 2024_
