@@ -1,17 +1,21 @@
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Navigation, Users, Building } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { ArrowRight, MapPin, Phone, Mail, Clock, Navigation, Building } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { locations } from '../services/mockData';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 // Fix for default markers in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
+
+const getMapsUrl = (lat: number, lng: number) =>
+  `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
 export function LocationsSection() {
   const FloatingParticle = ({ delay = 0, duration = 20, size = 'w-2 h-2' }) => (
@@ -224,21 +228,24 @@ export function LocationsSection() {
                   </div>
 
                   <div className="flex gap-4">
-                    <motion.button
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                    <Link
+                      to="/sedes/$slug"
+                      params={{ slug: location.slug }}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-green-600 to-green-700 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:from-green-700 hover:to-green-800 hover:shadow-xl"
                     >
-                      Ver en Google Maps
-                    </motion.button>
+                      Ver sede
+                      <ArrowRight className="h-5 w-5" />
+                    </Link>
                     
-                    <motion.button
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="px-6 py-3 border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white rounded-2xl font-semibold transition-all duration-300"
+                    <a
+                      href={getMapsUrl(location.coordinates.lat, location.coordinates.lng)}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Ver ${location.city} en Google Maps`}
+                      className="rounded-2xl border-2 border-green-600 px-6 py-3 font-semibold text-green-600 transition-all duration-300 hover:bg-green-600 hover:text-white"
                     >
-                      <Users className="h-5 w-5" />
-                    </motion.button>
+                      <Navigation className="h-5 w-5" />
+                    </a>
                   </div>
                 </div>
               </div>
@@ -265,13 +272,12 @@ export function LocationsSection() {
                 Agenda una cita previa para recibir atención personalizada y conocer nuestras instalaciones
               </p>
               
-              <motion.button
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+              <Link
+                to="/contacto"
                 className="bg-white text-green-700 px-8 py-4 rounded-2xl font-bold hover:bg-gray-50 transition-all duration-300 shadow-xl hover:shadow-2xl"
               >
                 Agendar Visita
-              </motion.button>
+              </Link>
             </div>
           </div>
         </motion.div>

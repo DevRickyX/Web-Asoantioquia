@@ -1,18 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ArrowRight, Play } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Leaf,
+  Pause,
+  Play,
+  Recycle,
+  Users,
+} from 'lucide-react';
 import { heroSlides } from '../services/mockData';
+
+const heroMetrics = [
+  { icon: Recycle, value: '12.5K', label: 'toneladas recicladas' },
+  { icon: Users, value: '450+', label: 'empleos generados' },
+  { icon: Leaf, value: '25', label: 'comunidades activas' },
+] as const;
 
 export function HeroSection() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   useEffect(() => {
+    if (!isAutoPlaying) return undefined;
+
     const interval = setInterval(() => {
       setCurrentSlideIndex((prev) => (prev + 1) % heroSlides.length);
-    }, 6000);
+    }, 7000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isAutoPlaying]);
 
   const nextSlide = () => {
     setCurrentSlideIndex((prev) => (prev + 1) % heroSlides.length);
@@ -25,198 +44,137 @@ export function HeroSection() {
   const currentSlide = heroSlides[currentSlideIndex];
 
   return (
-    <section className="relative h-screen overflow-hidden">
-      {/* Background Images */}
+    <section className="relative isolate min-h-[70svh] overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-950 to-emerald-900 md:h-[600px] md:min-h-0">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlideIndex}
-          initial={{ opacity: 0, scale: 1.1 }}
+          initial={{ opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
-          className="absolute inset-0"
+          exit={{ opacity: 0, scale: 1.02 }}
+          transition={{ duration: 0.9, ease: 'easeInOut' }}
+          className="absolute inset-0 z-0"
         >
           <img
             src={currentSlide.image}
-            alt="Reciclaje"
-            className="w-full h-full object-cover"
+            alt={currentSlide.title}
+            className="h-full w-full object-cover opacity-80"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/80 via-slate-950/62 to-slate-950/25" />
         </motion.div>
       </AnimatePresence>
 
-      {/* Floating Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{ 
-            y: [0, -20, 0],
-            rotate: [0, 5, 0]
-          }}
-          transition={{ 
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute top-20 right-20 w-32 h-32 bg-green-400/20 rounded-full blur-xl"
-        />
-        <motion.div
-          animate={{ 
-            y: [0, 30, 0],
-            rotate: [0, -5, 0]
-          }}
-          transition={{ 
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2
-          }}
-          className="absolute bottom-32 left-16 w-24 h-24 bg-green-600/30 rounded-full blur-lg"
-        />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 h-full flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="text-white">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentSlideIndex}
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                >
-                  <motion.h1 
-                    className="text-6xl md:text-8xl font-bold mb-6 leading-tight"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                  >
-                    {currentSlide.title}
-                    <br />
-                    <span className="bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text text-transparent">
-                      {currentSlide.subtitle}
-                    </span>
-                  </motion.h1>
-                  
-                  <motion.p
-                    className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed max-w-2xl"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.4 }}
-                  >
-                    {currentSlide.description}
-                  </motion.p>
-
-                  <motion.div
-                    className="flex flex-col sm:flex-row gap-6"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.6 }}
-                  >
-                    <motion.button 
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-2xl font-semibold flex items-center justify-center transition-all duration-300 shadow-2xl hover:shadow-green-500/25"
-                    >
-                      Conoce Nuestros Servicios
-                      <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                    </motion.button>
-                    
-                    <motion.button 
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="group border-2 border-white/80 text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 backdrop-blur-sm flex items-center justify-center"
-                    >
-                      <Play className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                      Ver Nuestro Impacto
-                    </motion.button>
-                  </motion.div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Stats Panel */}
+      <div className="relative z-20 mx-auto flex min-h-[70svh] max-w-7xl items-center px-4 py-12 sm:px-6 md:h-[600px] md:min-h-0 lg:px-8">
+        <div className="max-w-4xl text-white">
+          <AnimatePresence mode="wait">
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.8 }}
-              className="hidden lg:block"
+              key={currentSlideIndex}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.55, ease: 'easeOut' }}
             >
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
-                <h3 className="text-white text-2xl font-bold mb-6">Nuestro Impacto</h3>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-400 mb-2">12.5K</div>
-                    <div className="text-white/80 text-sm">Toneladas Recicladas</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-400 mb-2">450+</div>
-                    <div className="text-white/80 text-sm">Empleos Creados</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-400 mb-2">85</div>
-                    <div className="text-white/80 text-sm">Empresas Aliadas</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-400 mb-2">25</div>
-                    <div className="text-white/80 text-sm">Comunidades</div>
-                  </div>
-                </div>
+              <span className="inline-flex items-center rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur">
+                {currentSlide.eyebrow}
+              </span>
+
+              <h1 className="mt-6 max-w-3xl text-3xl font-bold leading-[1.08] text-white sm:text-5xl lg:text-7xl">
+                {currentSlide.title}
+                <span className="block text-emerald-100">
+                  {currentSlide.subtitle}
+                </span>
+              </h1>
+
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/95 sm:mt-6 sm:text-lg sm:leading-8">
+                {currentSlide.description}
+              </p>
+
+              <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row">
+                <Link
+                  to="/servicios"
+                  className="inline-flex items-center justify-center gap-3 rounded-full bg-emerald-500 px-6 py-3 text-sm font-bold text-white shadow-xl shadow-emerald-950/20 transition-colors duration-200 hover:bg-emerald-600"
+                >
+                  Conocer servicios
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  to="/impacto"
+                  className="inline-flex items-center justify-center rounded-full border border-white/60 px-6 py-3 text-sm font-bold text-white transition-colors duration-200 hover:bg-white hover:text-slate-950"
+                >
+                  Ver impacto
+                </Link>
               </div>
             </motion.div>
+          </AnimatePresence>
+
+          <div className="mt-10 hidden max-w-3xl grid-cols-1 gap-3 sm:grid sm:grid-cols-3">
+            {heroMetrics.map((metric) => {
+              const Icon = metric.icon;
+
+              return (
+                <div
+                  key={metric.label}
+                  className="flex items-center gap-3 rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-white backdrop-blur"
+                >
+                  <Icon className="h-5 w-5 shrink-0 text-emerald-200" />
+                  <div>
+                    <div className="text-xl font-bold">{metric.value}</div>
+                    <div className="text-xs font-medium uppercase text-emerald-50/75">
+                      {metric.label}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <motion.button
-        whileHover={{ scale: 1.1, x: -5 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={prevSlide}
-        className="absolute left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-4 rounded-full transition-all duration-300 border border-white/30"
-      >
-        <ChevronLeft className="h-6 w-6" />
-      </motion.button>
-      
-      <motion.button
-        whileHover={{ scale: 1.1, x: 5 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={nextSlide}
-        className="absolute right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-4 rounded-full transition-all duration-300 border border-white/30"
-      >
-        <ChevronRight className="h-6 w-6" />
-      </motion.button>
+      <div className="absolute bottom-6 left-4 right-4 z-30 mx-auto flex max-w-7xl items-center justify-between gap-4 px-0 sm:left-6 sm:right-6 lg:px-2">
+        <div className="ml-auto flex items-center gap-2 rounded-full border border-white/20 bg-slate-950/35 p-1.5 backdrop-blur">
+          <button
+            type="button"
+            onClick={prevSlide}
+            className="rounded-full p-2 text-white transition-colors duration-200 hover:bg-white/15"
+            aria-label="Anterior"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
 
-      {/* Dots Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-3">
-        {heroSlides.map((_, index) => (
-          <motion.button
-            key={index}
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setCurrentSlideIndex(index)}
-            className={`w-4 h-4 rounded-full transition-all duration-300 ${
-              index === currentSlideIndex 
-                ? 'bg-green-400 shadow-lg shadow-green-400/50' 
-                : 'bg-white/50 hover:bg-white/70'
-            }`}
-          />
-        ))}
-      </div>
+          <div className="flex items-center gap-1 px-1">
+            {heroSlides.map((slide, index) => (
+              <button
+                key={slide.title}
+                type="button"
+                onClick={() => setCurrentSlideIndex(index)}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  index === currentSlideIndex
+                    ? 'w-8 bg-emerald-300'
+                    : 'w-2.5 bg-white/50 hover:bg-white/75'
+                }`}
+                aria-label={`Ir a ${slide.title}`}
+              />
+            ))}
+          </div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-8 right-8 z-20 text-white/70"
-      >
-        <div className="flex flex-col items-center">
-          <span className="text-sm mb-2">Scroll</span>
-          <div className="w-px h-8 bg-white/50"></div>
+          <button
+            type="button"
+            onClick={() => setIsAutoPlaying((value) => !value)}
+            className="rounded-full p-2 text-white transition-colors duration-200 hover:bg-white/15"
+            aria-label={isAutoPlaying ? 'Pausar carrusel' : 'Reproducir carrusel'}
+          >
+            {isAutoPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={nextSlide}
+            className="rounded-full p-2 text-white transition-colors duration-200 hover:bg-white/15"
+            aria-label="Siguiente"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

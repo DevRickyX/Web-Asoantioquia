@@ -7,6 +7,10 @@ import { Values } from './pages/Values';
 import { Services } from './pages/Services';
 import { Impact } from './pages/Impact';
 import { Contact } from './pages/Contact';
+import { NewsDetail } from './pages/NewsDetail';
+import { TermsConditions } from './pages/TermsConditions';
+import { Locations } from './pages/Locations';
+import { LocationDetail } from './pages/LocationDetail';
 
 const rootRoute = createRootRoute({
   component: Root,
@@ -54,6 +58,30 @@ const contactRoute = createRoute({
   component: Contact,
 });
 
+const locationsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/sedes',
+  component: Locations,
+});
+
+const locationDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/sedes/$slug',
+  component: LocationDetail,
+});
+
+const newsDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/noticias/$slug',
+  component: NewsDetail,
+});
+
+const termsConditionsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/terminos-condiciones',
+  component: TermsConditions,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   missionRoute,
@@ -62,6 +90,10 @@ const routeTree = rootRoute.addChildren([
   servicesRoute,
   impactRoute,
   contactRoute,
+  locationsRoute,
+  locationDetailRoute,
+  newsDetailRoute,
+  termsConditionsRoute,
 ]);
 
 export const router = createRouter({ routeTree });

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from '@tanstack/react-router';
 import { Building2, ArrowRight, Users, Handshake } from 'lucide-react';
 import { partners } from '../services/mockData';
 
@@ -185,13 +186,12 @@ export function PartnersSection() {
                 </div>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+              <Link
+                to="/contacto"
                 className="w-full bg-white text-green-700 py-4 rounded-2xl font-bold hover:bg-gray-50 transition-all duration-300 shadow-lg"
               >
                 Solicitar Información
-              </motion.button>
+              </Link>
             </div>
           </motion.div>
         </div>

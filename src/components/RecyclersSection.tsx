@@ -1,8 +1,12 @@
 import { motion } from 'framer-motion';
+import { Link } from '@tanstack/react-router';
 import { Clock, MapPin, Quote } from 'lucide-react';
 import { recyclers } from '../services/mockData';
+import { useBackendCollection } from '../services/contentApi';
 
 export function RecyclersSection() {
+  const testimonials = useBackendCollection('/testimonials', recyclers);
+
   return (
     <section className="py-32 relative overflow-hidden">
       {/* Background */}
@@ -40,7 +44,7 @@ export function RecyclersSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {recyclers.map((recycler, index) => (
+          {testimonials.map((recycler, index) => (
             <motion.div
               key={recycler.id}
               initial={{ opacity: 0, y: 50 }}
@@ -106,13 +110,12 @@ export function RecyclersSection() {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
+          <Link
+            to="/responsabilidad-social"
             className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl"
           >
             Conoce más historias
-          </motion.button>
+          </Link>
         </motion.div>
       </div>
     </section>

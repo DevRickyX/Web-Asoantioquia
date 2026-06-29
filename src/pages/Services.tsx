@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { Truck, Recycle, GraduationCap, FileText, ArrowRight, CheckCircle, Star, Users } from 'lucide-react';
 import { services } from '../services/mockData';
@@ -167,23 +168,21 @@ export function Services() {
                         </div>
                         
                         <div className="flex flex-col sm:flex-row gap-4">
-                          <motion.button
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            whileTap={{ scale: 0.98 }}
+                          <Link
+                            to="/contacto"
                             className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center"
                           >
                             Solicitar Información
                             <ArrowRight className="ml-2 h-5 w-5" />
-                          </motion.button>
+                          </Link>
                           
-                          <motion.button
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            whileTap={{ scale: 0.98 }}
+                          <Link
+                            to="/impacto"
                             className="px-6 py-4 border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center"
                           >
                             <Users className="mr-2 h-5 w-5" />
                             Ver Casos
-                          </motion.button>
+                          </Link>
                         </div>
                       </motion.div>
                     </div>
@@ -213,21 +212,19 @@ export function Services() {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
+                  <Link
+                    to="/contacto"
                     className="bg-white text-green-700 px-8 py-4 rounded-2xl font-bold hover:bg-gray-50 transition-all duration-300 shadow-xl hover:shadow-2xl"
                   >
                     Solicitar Cotización
-                  </motion.button>
+                  </Link>
                   
-                  <motion.button
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
+                  <Link
+                    to="/contacto"
                     className="border-2 border-white text-white hover:bg-white hover:text-green-700 px-8 py-4 rounded-2xl font-bold transition-all duration-300"
                   >
                     Agendar Reunión
-                  </motion.button>
+                  </Link>
                 </div>
               </div>
             </div>
