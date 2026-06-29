@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { HeroSlide, NewsItem, Partner, Recycler } from './mockData';
+import { companyInfo, type HeroSlide, type NewsItem, type Partner, type Recycler } from './mockData';
 
 export interface ActivityGalleryItem {
   id: string;
@@ -60,6 +60,33 @@ export interface ImpactStat {
   label: string;
   detail: string;
 }
+
+export const defaultImpactStats: ImpactStat[] = [
+  {
+    icon: 'Recycle',
+    value: companyInfo.impact.tonnagesRecycled.toLocaleString('es-CO'),
+    label: 'Toneladas recicladas',
+    detail: 'Material recuperado y reintegrado a cadenas productivas.',
+  },
+  {
+    icon: 'Users',
+    value: `${companyInfo.impact.jobsCreated}+`,
+    label: 'Empleos generados',
+    detail: 'Oportunidades de trabajo digno para recicladores de oficio.',
+  },
+  {
+    icon: 'Building2',
+    value: `${companyInfo.impact.companiesPartnered}+`,
+    label: 'Empresas aliadas',
+    detail: 'Organizaciones vinculadas a programas de economia circular.',
+  },
+  {
+    icon: 'Leaf',
+    value: `${companyInfo.impact.communitiesBenefited}`,
+    label: 'Comunidades beneficiadas',
+    detail: 'Sectores acompanados con formacion, rutas y procesos sostenibles.',
+  },
+];
 
 export interface LandingMetrics {
   partners: number;

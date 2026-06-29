@@ -38,7 +38,9 @@ import {
   getAdminPartners,
   getAdminTestimonials,
   getHeroSlidesSetting,
+  getImpactStatsSetting,
   saveHeroSlides,
+  saveImpactStats,
   updateGalleryItem,
   updateNews,
   updatePartner,
@@ -49,10 +51,10 @@ import {
   type PartnerPayload,
   type TestimonialPayload,
 } from '../services/adminApi';
-import type { ActivityGalleryItem } from '../services/contentApi';
+import { defaultImpactStats, type ActivityGalleryItem, type ImpactStat } from '../services/contentApi';
 import { heroSlides, type HeroSlide, type NewsItem, type Partner, type Recycler } from '../services/mockData';
 
-type AdminTab = 'overview' | 'news' | 'gallery' | 'headers' | 'testimonials' | 'partners';
+type AdminTab = 'overview' | 'news' | 'gallery' | 'headers' | 'stats' | 'testimonials' | 'partners';
 type Notice = { type: 'success' | 'error'; text: string } | null;
 
 interface NewsFormState {
@@ -148,6 +150,7 @@ const tabs: Array<{ id: AdminTab; label: string; icon: LucideIcon }> = [
   { id: 'news', label: 'Noticias', icon: Newspaper },
   { id: 'gallery', label: 'Galeria', icon: ImagePlus },
   { id: 'headers', label: 'Headers', icon: Upload },
+  { id: 'stats', label: 'Cifras', icon: Sparkles },
   { id: 'testimonials', label: 'Testimonios', icon: Users },
   { id: 'partners', label: 'Aliados', icon: Handshake },
 ];
@@ -190,11 +193,16 @@ export function AdminDashboard() {
   const [partnerItems, setPartnerItems] = useState<Partner[]>([]);
   const [heroSlidesForm, setHeroSlidesForm] = useState<HeroSlide[]>([defaultHeroSlide]);
   const [selectedHeroIndex, setSelectedHeroIndex] = useState(0);
+  const [impactStats, setImpactStats] = useState<ImpactStat[]>(defaultImpactStats);
 
   const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
   const [selectedGalleryId, setSelectedGalleryId] = useState<string | null>(null);
   const [selectedTestimonialId, setSelectedTestimonialId] = useState<string | null>(null);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
+  const [newsEditorOpen, setNewsEditorOpen] = useState(false);
+  const [galleryEditorOpen, setGalleryEditorOpen] = useState(false);
+  const [testimonialEditorOpen, setTestimonialEditorOpen] = useState(false);
+  const [partnerEditorOpen, setPartnerEditorOpen] = useState(false);
 
   const [newsForm, setNewsForm] = useState<NewsFormState>(defaultNewsForm);
   const [galleryForm, setGalleryForm] = useState<GalleryFormState>(defaultGalleryForm);
@@ -209,6 +217,7 @@ export function AdminDashboard() {
   const [partnerFile, setPartnerFile] = useState<File | null>(null);
 
   const newsImagePreview = useObjectUrl(newsFile) || newsForm.featuredImage;
+  const newsGalleryPreviews = useObjectUrls(newsGalleryFiles);
   const galleryImagePreview = useObjectUrl(galleryFile) || galleryForm.image;
   const heroImagePreview = useObjectUrl(heroFile) || heroSlidesForm[selectedHeroIndex]?.image || '';
   const testimonialImagePreview = useObjectUrl(testimonialFile) || testimonialForm.image;
@@ -226,6 +235,17 @@ export function AdminDashboard() {
     } catch {
       setHeroSlidesForm([defaultHeroSlide]);
       setSelectedHeroIndex(0);
+    }
+  }, []);
+
+  const loadImpactStats = useCallback(async () => {
+    try {
+      const setting = await getImpactStatsSetting();
+      setImpactStats(Array.isArray(setting.value) && setting.value.length > 0
+        ? setting.value
+        : defaultImpactStats);
+    } catch {
+      setImpactStats(defaultImpactStats);
     }
   }, []);
 
@@ -253,11 +273,12 @@ export function AdminDashboard() {
         setToken(savedToken);
         setIsAuthenticated(true);
         void loadHeroSetting();
+        void loadImpactStats();
       })
       .catch(() => {
         localStorage.removeItem(adminTokenStorageKey);
       });
-  }, [loadHeroSetting, refreshContent]);
+  }, [loadHeroSetting, loadImpactStats, refreshContent]);
 
   const showNotice = (nextNotice: Notice) => {
     setNotice(nextNotice);
@@ -297,6 +318,7 @@ export function AdminDashboard() {
       setIsAuthenticated(true);
       await refreshContent(session.token);
       await loadHeroSetting();
+      await loadImpactStats();
       showNotice({ type: 'success', text: 'Sesion iniciada.' });
     } catch {
       showNotice({ type: 'error', text: 'Correo o contrasena invalidos.' });
@@ -321,6 +343,11 @@ export function AdminDashboard() {
     setNewsGalleryFiles([]);
   };
 
+  const startNewsForm = () => {
+    resetNewsForm();
+    setNewsEditorOpen(true);
+  };
+
   const editNews = (item: NewsItem) => {
     setSelectedNewsId(item.id);
     setNewsForm({
@@ -338,6 +365,7 @@ export function AdminDashboard() {
     });
     setNewsFile(null);
     setNewsGalleryFiles([]);
+    setNewsEditorOpen(true);
     setActiveTab('news');
   };
 
@@ -385,6 +413,7 @@ export function AdminDashboard() {
       }
 
       resetNewsForm();
+      setNewsEditorOpen(false);
       await refreshContent(token);
       showNotice({ type: 'success', text: selectedNewsId ? 'Noticia actualizada.' : 'Noticia creada.' });
     } catch (error) {
@@ -404,6 +433,7 @@ export function AdminDashboard() {
     try {
       await deleteNews(item.id, token);
       resetNewsForm();
+      setNewsEditorOpen(false);
       await refreshContent(token);
       showNotice({ type: 'success', text: 'Noticia eliminada.' });
     } catch {
@@ -419,6 +449,11 @@ export function AdminDashboard() {
     setGalleryFile(null);
   };
 
+  const startGalleryForm = () => {
+    resetGalleryForm();
+    setGalleryEditorOpen(true);
+  };
+
   const editGallery = (item: ActivityGalleryItem) => {
     setSelectedGalleryId(item.id);
     setGalleryForm({
@@ -430,6 +465,7 @@ export function AdminDashboard() {
       published: item.published ?? true,
     });
     setGalleryFile(null);
+    setGalleryEditorOpen(true);
     setActiveTab('gallery');
   };
 
@@ -465,6 +501,7 @@ export function AdminDashboard() {
       }
 
       resetGalleryForm();
+      setGalleryEditorOpen(false);
       await refreshContent(token);
       showNotice({ type: 'success', text: selectedGalleryId ? 'Imagen actualizada.' : 'Imagen agregada.' });
     } catch (error) {
@@ -484,6 +521,7 @@ export function AdminDashboard() {
     try {
       await deleteGalleryItem(item.id, token);
       resetGalleryForm();
+      setGalleryEditorOpen(false);
       await refreshContent(token);
       showNotice({ type: 'success', text: 'Imagen eliminada.' });
     } catch {
@@ -570,6 +608,11 @@ export function AdminDashboard() {
     setTestimonialFile(null);
   };
 
+  const startTestimonialForm = () => {
+    resetTestimonialForm();
+    setTestimonialEditorOpen(true);
+  };
+
   const editTestimonial = (item: Recycler) => {
     setSelectedTestimonialId(item.id);
     setTestimonialForm({
@@ -582,6 +625,7 @@ export function AdminDashboard() {
       published: item.published ?? true,
     });
     setTestimonialFile(null);
+    setTestimonialEditorOpen(true);
     setActiveTab('testimonials');
   };
 
@@ -618,6 +662,7 @@ export function AdminDashboard() {
       }
 
       resetTestimonialForm();
+      setTestimonialEditorOpen(false);
       await refreshContent(token);
       showNotice({ type: 'success', text: selectedTestimonialId ? 'Testimonio actualizado.' : 'Testimonio creado.' });
     } catch (error) {
@@ -637,6 +682,7 @@ export function AdminDashboard() {
     try {
       await deleteTestimonial(item.id, token);
       resetTestimonialForm();
+      setTestimonialEditorOpen(false);
       await refreshContent(token);
       showNotice({ type: 'success', text: 'Testimonio eliminado.' });
     } catch {
@@ -652,6 +698,11 @@ export function AdminDashboard() {
     setPartnerFile(null);
   };
 
+  const startPartnerForm = () => {
+    resetPartnerForm();
+    setPartnerEditorOpen(true);
+  };
+
   const editPartner = (item: Partner) => {
     setSelectedPartnerId(item.id);
     setPartnerForm({
@@ -663,6 +714,7 @@ export function AdminDashboard() {
       published: item.published ?? true,
     });
     setPartnerFile(null);
+    setPartnerEditorOpen(true);
     setActiveTab('partners');
   };
 
@@ -698,6 +750,7 @@ export function AdminDashboard() {
       }
 
       resetPartnerForm();
+      setPartnerEditorOpen(false);
       await refreshContent(token);
       showNotice({ type: 'success', text: selectedPartnerId ? 'Aliado actualizado.' : 'Aliado creado.' });
     } catch (error) {
@@ -717,10 +770,33 @@ export function AdminDashboard() {
     try {
       await deletePartner(item.id, token);
       resetPartnerForm();
+      setPartnerEditorOpen(false);
       await refreshContent(token);
       showNotice({ type: 'success', text: 'Aliado eliminado.' });
     } catch {
       showNotice({ type: 'error', text: 'No se pudo eliminar el aliado.' });
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const updateImpactStat = (index: number, field: keyof ImpactStat, value: string) => {
+    setImpactStats((current) =>
+      current.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, [field]: value } : item,
+      ),
+    );
+  };
+
+  const handleStatsSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsBusy(true);
+
+    try {
+      await saveImpactStats(impactStats, token);
+      showNotice({ type: 'success', text: 'Cifras actualizadas.' });
+    } catch {
+      showNotice({ type: 'error', text: 'No se pudieron guardar las cifras.' });
     } finally {
       setIsBusy(false);
     }
@@ -870,39 +946,40 @@ export function AdminDashboard() {
 
           <div className="space-y-6">
             {activeTab === 'overview' && (
-              <>
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-                  <SummaryCard icon={Newspaper} label="Noticias" value={newsItems.length} />
-                  <SummaryCard icon={ImagePlus} label="Imagenes" value={galleryItems.length} />
-                  <SummaryCard icon={Upload} label="Headers" value={heroSlidesForm.length} />
-                  <SummaryCard icon={Users} label="Testimonios" value={testimonialItems.length} />
-                  <SummaryCard icon={Handshake} label="Aliados" value={partnerItems.length} />
-                </div>
-                <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-                  <SectionTitle icon={Sparkles} title="Cifras automaticas para la landing" />
-                  <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600">
-                    La seccion de cifras publica se alimenta del backend: cuenta noticias publicadas, imagenes de galeria, testimonios y aliados activos. Al crear o eliminar contenido aqui, esas cifras se actualizan solas.
-                  </p>
-                </div>
-              </>
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+                <SummaryCard icon={Newspaper} label="Noticias" value={newsItems.length} />
+                <SummaryCard icon={ImagePlus} label="Imagenes" value={galleryItems.length} />
+                <SummaryCard icon={Upload} label="Headers" value={heroSlidesForm.length} />
+                <SummaryCard icon={Sparkles} label="Cifras" value={impactStats.length} />
+                <SummaryCard icon={Users} label="Testimonios" value={testimonialItems.length} />
+                <SummaryCard icon={Handshake} label="Aliados" value={partnerItems.length} />
+              </div>
             )}
 
             {activeTab === 'news' && (
-              <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
-                <ContentList
-                  title="Noticias existentes"
-                  items={newsItems}
-                  emptyText="No hay noticias todavia."
-                  getTitle={(item) => item.title}
-                  getSubtitle={(item) => item.category}
-                  getImage={(item) => item.image}
-                  onNew={resetNewsForm}
-                  onEdit={editNews}
-                  onDelete={handleDeleteNews}
-                />
-
-                <form onSubmit={handleNewsSubmit} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-                  <SectionTitle icon={Newspaper} title={selectedNewsId ? 'Editar noticia' : 'Crear noticia'} />
+              <div className="space-y-6">
+                {!newsEditorOpen ? (
+                  <ContentList
+                    title="Noticias existentes"
+                    items={newsItems}
+                    emptyText="No hay noticias todavia."
+                    getTitle={(item) => item.title}
+                    getSubtitle={(item) => item.category}
+                    getImage={(item) => item.image}
+                    onNew={startNewsForm}
+                    onEdit={editNews}
+                    onDelete={handleDeleteNews}
+                  />
+                ) : (
+                <form onSubmit={handleNewsSubmit} className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+                  <EditorHeader
+                    icon={Newspaper}
+                    title={selectedNewsId ? 'Editar noticia' : 'Crear noticia'}
+                    onBack={() => {
+                      resetNewsForm();
+                      setNewsEditorOpen(false);
+                    }}
+                  />
                   <div className="mt-6 grid gap-6 2xl:grid-cols-[1fr_380px]">
                     <div>
                       <div className="grid gap-4 md:grid-cols-2">
@@ -919,6 +996,7 @@ export function AdminDashboard() {
                           onChange={(event) => setNewsGalleryFiles(Array.from(event.target.files || []))}
                         />
                       </div>
+                      <SelectedImageStrip images={newsGalleryPreviews} />
                       <div className="mt-4 grid gap-4 md:grid-cols-2">
                         <TextArea label="Resumen" value={newsForm.excerpt} onChange={(value) => setNewsForm({ ...newsForm, excerpt: value })} required />
                         <TextArea label="Descripcion" value={newsForm.description} onChange={(value) => setNewsForm({ ...newsForm, description: value })} />
@@ -936,28 +1014,37 @@ export function AdminDashboard() {
                       />
                       <SubmitButton isBusy={isBusy} label={selectedNewsId ? 'Actualizar noticia' : 'Crear noticia'} />
                     </div>
-                    <NewsPreview form={newsForm} image={newsImagePreview} />
+                    <NewsPreview form={newsForm} image={newsImagePreview} galleryPreviews={newsGalleryPreviews} />
                   </div>
                 </form>
+                )}
               </div>
             )}
 
             {activeTab === 'gallery' && (
-              <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
-                <ContentList
-                  title="Galeria existente"
-                  items={galleryItems}
-                  emptyText="No hay imagenes todavia."
-                  getTitle={(item) => item.title}
-                  getSubtitle={(item) => item.featured ? 'Destacada' : item.category}
-                  getImage={(item) => item.image}
-                  onNew={resetGalleryForm}
-                  onEdit={editGallery}
-                  onDelete={handleDeleteGallery}
-                />
-
-                <form onSubmit={handleGallerySubmit} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-                  <SectionTitle icon={ImagePlus} title={selectedGalleryId ? 'Editar imagen' : 'Cargar imagen'} />
+              <div className="space-y-6">
+                {!galleryEditorOpen ? (
+                  <ContentList
+                    title="Galeria existente"
+                    items={galleryItems}
+                    emptyText="No hay imagenes todavia."
+                    getTitle={(item) => item.title}
+                    getSubtitle={(item) => item.featured ? 'Destacada' : item.category}
+                    getImage={(item) => item.image}
+                    onNew={startGalleryForm}
+                    onEdit={editGallery}
+                    onDelete={handleDeleteGallery}
+                  />
+                ) : (
+                <form onSubmit={handleGallerySubmit} className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+                  <EditorHeader
+                    icon={ImagePlus}
+                    title={selectedGalleryId ? 'Editar imagen' : 'Cargar imagen'}
+                    onBack={() => {
+                      resetGalleryForm();
+                      setGalleryEditorOpen(false);
+                    }}
+                  />
                   <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
                     <div>
                       <div className="grid gap-4 md:grid-cols-2">
@@ -987,11 +1074,12 @@ export function AdminDashboard() {
                     <ImagePreview image={galleryImagePreview} title={galleryForm.title} subtitle={galleryForm.category} />
                   </div>
                 </form>
+                )}
               </div>
             )}
 
             {activeTab === 'headers' && (
-              <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
+              <div className="space-y-6">
                 <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
                   <div className="flex items-center justify-between gap-3">
                     <h2 className="text-base font-bold text-slate-950">Headers</h2>
@@ -1029,7 +1117,7 @@ export function AdminDashboard() {
                   </div>
                 </div>
 
-                <form onSubmit={handleHeroSubmit} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <form onSubmit={handleHeroSubmit} className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
                   <div className="flex items-start justify-between gap-4">
                     <SectionTitle icon={Upload} title={`Editar header ${selectedHeroIndex + 1}`} />
                     <button
@@ -1046,7 +1134,11 @@ export function AdminDashboard() {
                       <TextField label="Etiqueta" value={currentHero.eyebrow} onChange={(value) => updateCurrentHero('eyebrow', value)} />
                       <TextField label="Titulo" value={currentHero.title} onChange={(value) => updateCurrentHero('title', value)} />
                       <TextField label="Subtitulo" value={currentHero.subtitle} onChange={(value) => updateCurrentHero('subtitle', value)} />
-                      <FileField label="Imagen del header" onChange={(event) => handleFile(event, setHeroFile)} />
+                      <FileField
+                        label="Imagen del header"
+                        helper="Resolucion recomendada: 1920 x 1080 px, horizontal y con peso optimizado."
+                        onChange={(event) => handleFile(event, setHeroFile)}
+                      />
                       <TextField label="URL de imagen" value={currentHero.image} onChange={(value) => updateCurrentHero('image', value)} />
                       <TextField label="Cifra" value={currentHero.statValue} onChange={(value) => updateCurrentHero('statValue', value)} />
                       <TextField label="Etiqueta de cifra" value={currentHero.statLabel} onChange={(value) => updateCurrentHero('statLabel', value)} />
@@ -1059,22 +1151,75 @@ export function AdminDashboard() {
               </div>
             )}
 
-            {activeTab === 'testimonials' && (
-              <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
-                <ContentList
-                  title="Testimonios"
-                  items={testimonialItems}
-                  emptyText="No hay testimonios todavia."
-                  getTitle={(item) => item.name}
-                  getSubtitle={(item) => item.role || item.location}
-                  getImage={(item) => item.image}
-                  onNew={resetTestimonialForm}
-                  onEdit={editTestimonial}
-                  onDelete={handleDeleteTestimonial}
-                />
+            {activeTab === 'stats' && (
+              <form onSubmit={handleStatsSubmit} className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+                <SectionTitle icon={Sparkles} title="Cifras de impacto" />
+                <div className="mt-8 grid gap-5 xl:grid-cols-2">
+                  {impactStats.map((stat, index) => (
+                    <div key={`${stat.label}-${index}`} className="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                      <div className="grid gap-4 md:grid-cols-[0.8fr_1fr]">
+                        <label className="block">
+                          <span className={labelClass}>Icono</span>
+                          <select
+                            value={stat.icon}
+                            onChange={(event) => updateImpactStat(index, 'icon', event.target.value)}
+                            className={`${inputClass} mt-2`}
+                          >
+                            <option value="Recycle">Reciclaje</option>
+                            <option value="Users">Personas</option>
+                            <option value="Building2">Empresas</option>
+                            <option value="Leaf">Ambiental</option>
+                          </select>
+                        </label>
+                        <TextField
+                          label="Valor"
+                          value={stat.value}
+                          onChange={(value) => updateImpactStat(index, 'value', value)}
+                        />
+                      </div>
+                      <div className="mt-4 grid gap-4 md:grid-cols-2">
+                        <TextField
+                          label="Etiqueta"
+                          value={stat.label}
+                          onChange={(value) => updateImpactStat(index, 'label', value)}
+                        />
+                        <TextArea
+                          label="Detalle"
+                          value={stat.detail}
+                          onChange={(value) => updateImpactStat(index, 'detail', value)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <SubmitButton isBusy={isBusy} label="Guardar cifras" />
+              </form>
+            )}
 
-                <form onSubmit={handleTestimonialSubmit} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-                  <SectionTitle icon={Users} title={selectedTestimonialId ? 'Editar testimonio' : 'Crear testimonio'} />
+            {activeTab === 'testimonials' && (
+              <div className="space-y-6">
+                {!testimonialEditorOpen ? (
+                  <ContentList
+                    title="Testimonios"
+                    items={testimonialItems}
+                    emptyText="No hay testimonios todavia."
+                    getTitle={(item) => item.name}
+                    getSubtitle={(item) => item.role || item.location}
+                    getImage={(item) => item.image}
+                    onNew={startTestimonialForm}
+                    onEdit={editTestimonial}
+                    onDelete={handleDeleteTestimonial}
+                  />
+                ) : (
+                <form onSubmit={handleTestimonialSubmit} className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+                  <EditorHeader
+                    icon={Users}
+                    title={selectedTestimonialId ? 'Editar testimonio' : 'Crear testimonio'}
+                    onBack={() => {
+                      resetTestimonialForm();
+                      setTestimonialEditorOpen(false);
+                    }}
+                  />
                   <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
                     <div>
                       <div className="grid gap-4 md:grid-cols-2">
@@ -1097,25 +1242,34 @@ export function AdminDashboard() {
                     <TestimonialPreview form={testimonialForm} image={testimonialImagePreview} />
                   </div>
                 </form>
+                )}
               </div>
             )}
 
             {activeTab === 'partners' && (
-              <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
-                <ContentList
-                  title="Aliados"
-                  items={partnerItems}
-                  emptyText="No hay aliados todavia."
-                  getTitle={(item) => item.name}
-                  getSubtitle={(item) => item.category}
-                  getImage={(item) => item.logo}
-                  onNew={resetPartnerForm}
-                  onEdit={editPartner}
-                  onDelete={handleDeletePartner}
-                />
-
-                <form onSubmit={handlePartnerSubmit} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-                  <SectionTitle icon={Handshake} title={selectedPartnerId ? 'Editar aliado' : 'Crear aliado'} />
+              <div className="space-y-6">
+                {!partnerEditorOpen ? (
+                  <ContentList
+                    title="Aliados"
+                    items={partnerItems}
+                    emptyText="No hay aliados todavia."
+                    getTitle={(item) => item.name}
+                    getSubtitle={(item) => item.category}
+                    getImage={(item) => item.logo}
+                    onNew={startPartnerForm}
+                    onEdit={editPartner}
+                    onDelete={handleDeletePartner}
+                  />
+                ) : (
+                <form onSubmit={handlePartnerSubmit} className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+                  <EditorHeader
+                    icon={Handshake}
+                    title={selectedPartnerId ? 'Editar aliado' : 'Crear aliado'}
+                    onBack={() => {
+                      resetPartnerForm();
+                      setPartnerEditorOpen(false);
+                    }}
+                  />
                   <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
                     <div>
                       <div className="grid gap-4 md:grid-cols-2">
@@ -1137,6 +1291,7 @@ export function AdminDashboard() {
                     <PartnerPreview form={partnerForm} image={partnerLogoPreview} />
                   </div>
                 </form>
+                )}
               </div>
             )}
           </div>
@@ -1162,6 +1317,21 @@ function useObjectUrl(file: File | null) {
   }, [file]);
 
   return url;
+}
+
+function useObjectUrls(files: File[]) {
+  const [urls, setUrls] = useState<string[]>([]);
+
+  useEffect(() => {
+    const nextUrls = files.map((file) => URL.createObjectURL(file));
+    setUrls(nextUrls);
+
+    return () => {
+      nextUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [files]);
+
+  return urls;
 }
 
 function SummaryCard({
@@ -1193,6 +1363,29 @@ function SectionTitle({ icon: Icon, title }: { icon: LucideIcon; title: string }
         <Icon className="h-5 w-5" />
       </span>
       <h2 className="text-xl font-bold text-slate-950">{title}</h2>
+    </div>
+  );
+}
+
+function EditorHeader({
+  icon: Icon,
+  title,
+  onBack,
+}: {
+  icon: LucideIcon;
+  title: string;
+  onBack: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <SectionTitle icon={Icon} title={title} />
+      <button
+        type="button"
+        onClick={onBack}
+        className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+      >
+        Volver al listado
+      </button>
     </div>
   );
 }
@@ -1309,20 +1502,27 @@ function FileField({
   label,
   onChange,
   multiple = false,
+  helper,
 }: {
   label: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   multiple?: boolean;
+  helper?: string;
 }) {
   return (
     <label className="block">
       <span className={labelClass}>{label}</span>
+      {helper && (
+        <span className="mt-1 block text-xs font-medium text-slate-500">
+          {helper}
+        </span>
+      )}
       <input
         onChange={onChange}
         type="file"
         accept="image/*"
         multiple={multiple}
-        className="mt-2 block w-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-emerald-700 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:border-emerald-300"
+        className="mt-2 block w-full cursor-pointer rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600 file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-emerald-700 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:border-emerald-300"
       />
     </label>
   );
@@ -1383,7 +1583,7 @@ function ContentList<T extends { id: string }>({
   onDelete: (item: T) => void;
 }) {
   return (
-    <div className="h-fit rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="h-fit rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-base font-bold text-slate-950">{title}</h2>
         <button
@@ -1396,23 +1596,23 @@ function ContentList<T extends { id: string }>({
         </button>
       </div>
 
-      <div className="mt-4 max-h-[680px] space-y-3 overflow-y-auto pr-1">
+      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.length === 0 && (
           <p className="rounded-lg border border-dashed border-slate-200 p-4 text-sm text-slate-500">
             {emptyText}
           </p>
         )}
         {items.map((item) => (
-          <div key={item.id} className="rounded-lg border border-slate-100 p-3">
-            <button type="button" onClick={() => onEdit(item)} className="flex w-full gap-3 text-left">
+          <div key={item.id} className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm transition hover:border-emerald-200 hover:shadow-md">
+            <button type="button" onClick={() => onEdit(item)} className="flex w-full gap-4 text-left">
               {getImage(item) ? (
-                <img src={getImage(item)} alt={getTitle(item)} className="h-16 w-20 rounded-md object-cover" />
+                <img src={getImage(item)} alt={getTitle(item)} className="h-20 w-24 rounded-md object-cover" />
               ) : (
-                <span className="flex h-16 w-20 items-center justify-center rounded-md bg-slate-100 text-slate-400">
+                <span className="flex h-20 w-24 items-center justify-center rounded-md bg-slate-100 text-slate-400">
                   <Images className="h-5 w-5" />
                 </span>
               )}
-              <span>
+              <span className="min-w-0">
                 <span className="line-clamp-2 text-sm font-bold text-slate-900">{getTitle(item)}</span>
                 <span className="mt-1 block text-xs text-slate-500">{getSubtitle(item)}</span>
               </span>
@@ -1469,8 +1669,39 @@ function ImagePreview({
   );
 }
 
-function NewsPreview({ form, image }: { form: NewsFormState; image: string }) {
+function SelectedImageStrip({ images }: { images: string[] }) {
+  if (!images.length) return null;
+
+  return (
+    <div className="mt-4 rounded-lg border border-emerald-100 bg-emerald-50/60 p-3">
+      <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+        Imagenes seleccionadas
+      </p>
+      <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-5">
+        {images.map((image) => (
+          <img
+            key={image}
+            src={image}
+            alt="Vista previa"
+            className="aspect-square rounded-lg object-cover"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function NewsPreview({
+  form,
+  image,
+  galleryPreviews,
+}: {
+  form: NewsFormState;
+  image: string;
+  galleryPreviews: string[];
+}) {
   const gallery = splitUrls(form.galleryText);
+  const galleryImages = [...gallery, ...galleryPreviews];
   const content = splitParagraphs(form.contentText);
 
   return (
@@ -1500,9 +1731,9 @@ function NewsPreview({ form, image }: { form: NewsFormState; image: string }) {
             <PreviewBlock key={`${block}-${index}`} block={block} />
           ))}
         </div>
-        {gallery.length > 0 && (
+        {galleryImages.length > 0 && (
           <div className="mt-5 grid grid-cols-3 gap-2">
-            {gallery.slice(0, 3).map((item) => (
+            {galleryImages.slice(0, 3).map((item) => (
               <img key={item} src={item} alt="Galeria" className="aspect-square rounded-lg object-cover" />
             ))}
           </div>

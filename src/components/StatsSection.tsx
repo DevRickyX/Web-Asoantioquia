@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Building2, Leaf, Recycle, TrendingUp, Users } from 'lucide-react';
-import { companyInfo } from '../services/mockData';
-import { type ImpactStat, type LandingMetrics, useBackendItem } from '../services/contentApi';
+import { defaultImpactStats, useBackendSetting } from '../services/contentApi';
 
 const statIcons = {
   Recycle,
@@ -29,42 +28,8 @@ const statStyles = [
   },
 ] as const;
 
-const defaultImpactStats: ImpactStat[] = [
-  {
-    icon: 'Recycle',
-    value: companyInfo.impact.tonnagesRecycled.toLocaleString('es-CO'),
-    label: 'Toneladas recicladas',
-    detail: 'Material recuperado y reintegrado a cadenas productivas.',
-  },
-  {
-    icon: 'Users',
-    value: `${companyInfo.impact.jobsCreated}+`,
-    label: 'Empleos generados',
-    detail: 'Oportunidades de trabajo digno para recicladores de oficio.',
-  },
-  {
-    icon: 'Building2',
-    value: `${companyInfo.impact.companiesPartnered}+`,
-    label: 'Empresas aliadas',
-    detail: 'Organizaciones vinculadas a programas de economia circular.',
-  },
-  {
-    icon: 'Leaf',
-    value: `${companyInfo.impact.communitiesBenefited}`,
-    label: 'Comunidades beneficiadas',
-    detail: 'Sectores acompanados con formacion, rutas y procesos sostenibles.',
-  },
-];
-
 export function StatsSection() {
-  const metrics = useBackendItem<LandingMetrics>('/metrics/landing', {
-    partners: companyInfo.impact.companiesPartnered,
-    gallery: 0,
-    news: 0,
-    testimonials: 0,
-    stats: defaultImpactStats,
-  });
-  const stats = metrics?.stats?.length ? metrics.stats : defaultImpactStats;
+  const stats = useBackendSetting('impact-stats', defaultImpactStats);
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-cyan-50 py-24">
