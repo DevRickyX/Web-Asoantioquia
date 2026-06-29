@@ -105,7 +105,9 @@ function splitUrls(value: string) {
 
 export function AdminDashboard() {
   const [token, setToken] = useState('');
-  const [loginToken, setLoginToken] = useState('');
+  const [loginEmail, setLoginEmail] = useState('admin@asoantioquia.org');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [sessionEmail, setSessionEmail] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [notice, setNotice] = useState<Notice>(null);
@@ -145,12 +147,10 @@ export function AdminDashboard() {
 
     if (!savedToken) return;
 
-    adminLogin(savedToken)
+    refreshContent(savedToken)
       .then(() => {
         setToken(savedToken);
-        setLoginToken(savedToken);
         setIsAuthenticated(true);
-        void refreshContent(savedToken);
         void loadHeroSetting();
       })
       .catch(() => {
@@ -170,15 +170,16 @@ export function AdminDashboard() {
     setIsBusy(true);
 
     try {
-      await adminLogin(loginToken);
-      localStorage.setItem(adminTokenStorageKey, loginToken);
-      setToken(loginToken);
+      const session = await adminLogin(loginEmail, loginPassword);
+      localStorage.setItem(adminTokenStorageKey, session.token);
+      setToken(session.token);
+      setSessionEmail(session.user.email);
       setIsAuthenticated(true);
-      await refreshContent(loginToken);
+      await refreshContent(session.token);
       await loadHeroSetting();
       showNotice({ type: 'success', text: 'Sesión iniciada.' });
     } catch {
-      showNotice({ type: 'error', text: 'Token inválido.' });
+      showNotice({ type: 'error', text: 'Correo o contraseña inválidos.' });
     } finally {
       setIsBusy(false);
     }
@@ -187,7 +188,8 @@ export function AdminDashboard() {
   const handleLogout = () => {
     localStorage.removeItem(adminTokenStorageKey);
     setToken('');
-    setLoginToken('');
+    setLoginPassword('');
+    setSessionEmail('');
     setIsAuthenticated(false);
     setActiveTab('overview');
   };
@@ -347,18 +349,31 @@ export function AdminDashboard() {
               </span>
               <div>
                 <h2 className="text-xl font-bold">Iniciar sesión</h2>
-                <p className="text-sm text-slate-500">Token administrativo</p>
+                <p className="text-sm text-slate-500">Correo y contraseña</p>
               </div>
             </div>
 
             <label className="mt-6 block">
-              <span className={labelClass}>Token</span>
+              <span className={labelClass}>Correo</span>
               <input
-                value={loginToken}
-                onChange={(event) => setLoginToken(event.target.value)}
+                value={loginEmail}
+                onChange={(event) => setLoginEmail(event.target.value)}
+                className={`${inputClass} mt-2`}
+                type="email"
+                autoComplete="email"
+                required
+              />
+            </label>
+
+            <label className="mt-4 block">
+              <span className={labelClass}>Contraseña</span>
+              <input
+                value={loginPassword}
+                onChange={(event) => setLoginPassword(event.target.value)}
                 className={`${inputClass} mt-2`}
                 type="password"
                 autoComplete="current-password"
+                required
               />
             </label>
 
@@ -385,6 +400,9 @@ export function AdminDashboard() {
               Asoantioquia
             </span>
             <h1 className="mt-1 text-3xl font-bold text-slate-950">Dashboard administrador</h1>
+            {sessionEmail && (
+              <p className="mt-1 text-sm font-medium text-slate-500">{sessionEmail}</p>
+            )}
           </div>
           <button
             type="button"

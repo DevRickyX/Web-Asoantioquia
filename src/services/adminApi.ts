@@ -3,6 +3,16 @@ import type { HeroSlide, NewsItem } from './mockData';
 
 export const adminTokenStorageKey = 'asoantioquia-admin-token';
 
+export interface AdminSession {
+  ok: boolean;
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    name?: string;
+  };
+}
+
 export interface MediaAsset {
   id: string;
   url: string;
@@ -67,10 +77,10 @@ async function adminRequest<T>(
   return response.json() as Promise<T>;
 }
 
-export function adminLogin(token: string) {
-  return adminRequest<{ ok: boolean; token: string }>('/auth/login', token, {
+export function adminLogin(email: string, password: string) {
+  return adminRequest<AdminSession>('/auth/login', '', {
     method: 'POST',
-    body: JSON.stringify({ token }),
+    body: JSON.stringify({ email, password }),
   });
 }
 
