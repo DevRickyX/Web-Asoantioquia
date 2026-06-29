@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import type { HeroSlide, NewsItem, Partner, Recycler } from './mockData';
-import type { ImpactStat } from '../components/StatsSection';
 
 export interface ActivityGalleryItem {
   id: string;
@@ -9,6 +8,7 @@ export interface ActivityGalleryItem {
   image: string;
   featured?: boolean;
   description?: string;
+  published?: boolean;
 }
 
 export const fallbackGalleryItems: ActivityGalleryItem[] = [
@@ -53,6 +53,14 @@ export interface SiteSetting<T> {
 }
 
 type BackendCollection = NewsItem[] | Recycler[] | ActivityGalleryItem[] | HeroSlide[];
+
+export interface ImpactStat {
+  icon: 'Recycle' | 'Users' | 'Building2' | 'Leaf';
+  value: string;
+  label: string;
+  detail: string;
+}
+
 export interface LandingMetrics {
   partners: number;
   gallery: number;

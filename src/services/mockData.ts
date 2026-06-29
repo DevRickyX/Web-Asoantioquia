@@ -20,15 +20,18 @@ export interface NewsItem {
   readTime: string;
   content: string[];
   gallery: string[];
+  published?: boolean;
 }
 
 export interface Recycler {
   id: string;
   name: string;
+  role?: string;
   story: string;
   image: string;
   location: string;
   yearsWorking: number;
+  published?: boolean;
 }
 
 export interface Location {

@@ -1,5 +1,5 @@
-import { apiBaseUrl, type ActivityGalleryItem, type SiteSetting } from './contentApi';
-import type { HeroSlide, NewsItem } from './mockData';
+import { apiBaseUrl, type ActivityGalleryItem, type ImpactStat, type SiteSetting } from './contentApi';
+import type { HeroSlide, NewsItem, Partner, Recycler } from './mockData';
 
 export const adminTokenStorageKey = 'asoantioquia-admin-token';
 
@@ -46,6 +46,25 @@ export interface GalleryPayload {
   image: string;
   description?: string;
   featured: boolean;
+  published: boolean;
+}
+
+export interface TestimonialPayload {
+  name: string;
+  role: string;
+  story: string;
+  image: string;
+  location: string;
+  yearsWorking: number;
+  published: boolean;
+}
+
+export interface PartnerPayload {
+  name: string;
+  logo: string;
+  category: string;
+  website?: string;
+  description?: string;
   published: boolean;
 }
 
@@ -107,6 +126,19 @@ export function createNews(payload: NewsPayload, token: string) {
   });
 }
 
+export function updateNews(id: string, payload: NewsPayload, token: string) {
+  return adminRequest<NewsItem>(`/news/${id}`, token, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteNews(id: string, token: string) {
+  return adminRequest<{ ok: boolean }>(`/news/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
 export function getAdminNews(token: string) {
   return adminRequest<NewsItem[]>('/news/admin/all', token);
 }
@@ -118,8 +150,69 @@ export function createGalleryItem(payload: GalleryPayload, token: string) {
   });
 }
 
+export function updateGalleryItem(id: string, payload: GalleryPayload, token: string) {
+  return adminRequest<ActivityGalleryItem>(`/gallery/${id}`, token, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteGalleryItem(id: string, token: string) {
+  return adminRequest<{ ok: boolean }>(`/gallery/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
 export function getAdminGallery(token: string) {
   return adminRequest<ActivityGalleryItem[]>('/gallery/admin/all', token);
+}
+
+export function getAdminTestimonials(token: string) {
+  return adminRequest<Recycler[]>('/testimonials/admin/all', token);
+}
+
+export function createTestimonial(payload: TestimonialPayload, token: string) {
+  return adminRequest<Recycler>('/testimonials', token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateTestimonial(id: string, payload: TestimonialPayload, token: string) {
+  return adminRequest<Recycler>(`/testimonials/${id}`, token, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteTestimonial(id: string, token: string) {
+  return adminRequest<{ ok: boolean }>(`/testimonials/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
+export function getAdminPartners(token: string) {
+  return adminRequest<Partner[]>('/partners/admin/all', token);
+}
+
+export function createPartner(payload: PartnerPayload, token: string) {
+  return adminRequest<Partner>('/partners', token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updatePartner(id: string, payload: PartnerPayload, token: string) {
+  return adminRequest<Partner>(`/partners/${id}`, token, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deletePartner(id: string, token: string) {
+  return adminRequest<{ ok: boolean }>(`/partners/${id}`, token, {
+    method: 'DELETE',
+  });
 }
 
 export function getHeroSlidesSetting() {
@@ -136,5 +229,22 @@ export function saveHeroSlides(slides: HeroSlide[], token: string) {
   return adminRequest<SiteSetting<HeroSlide[]>>('/settings/hero-slides', token, {
     method: 'PUT',
     body: JSON.stringify({ value: slides }),
+  });
+}
+
+export function getImpactStatsSetting() {
+  return fetch(`${apiBaseUrl}/api/settings/impact-stats`).then((response) => {
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    return response.json() as Promise<SiteSetting<ImpactStat[]>>;
+  });
+}
+
+export function saveImpactStats(stats: ImpactStat[], token: string) {
+  return adminRequest<SiteSetting<ImpactStat[]>>('/settings/impact-stats', token, {
+    method: 'PUT',
+    body: JSON.stringify({ value: stats }),
   });
 }

@@ -1,14 +1,7 @@
 import { motion } from 'framer-motion';
 import { Building2, Leaf, Recycle, TrendingUp, Users } from 'lucide-react';
 import { companyInfo } from '../services/mockData';
-import { type LandingMetrics, useBackendItem } from '../services/contentApi';
-
-export interface ImpactStat {
-  icon: 'Recycle' | 'Users' | 'Building2' | 'Leaf';
-  value: string;
-  label: string;
-  detail: string;
-}
+import { type ImpactStat, type LandingMetrics, useBackendItem } from '../services/contentApi';
 
 const statIcons = {
   Recycle,
@@ -36,7 +29,7 @@ const statStyles = [
   },
 ] as const;
 
-export const defaultImpactStats: ImpactStat[] = [
+const defaultImpactStats: ImpactStat[] = [
   {
     icon: 'Recycle',
     value: companyInfo.impact.tonnagesRecycled.toLocaleString('es-CO'),
