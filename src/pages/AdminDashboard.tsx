@@ -1,25 +1,35 @@
-import { type ChangeEvent, type FormEvent, useCallback, useEffect, useState } from 'react';
+import { type ChangeEvent, type FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import {
   AlertCircle,
+  Bold,
   CheckCircle2,
+  Code2,
   Eye,
   FileText,
   Handshake,
   Heading2,
   ImagePlus,
   Images,
+  Italic,
   LayoutDashboard,
+  Link2,
   List,
+  ListOrdered,
   Loader2,
   LogOut,
+  MessageCircle,
   Newspaper,
   Plus,
+  Quote,
   Save,
   ShieldCheck,
   Sparkles,
+  Strikethrough,
   Trash2,
+  Underline,
   Upload,
   Users,
+  Wand2,
   type LucideIcon,
 } from 'lucide-react';
 import {
@@ -53,9 +63,11 @@ import {
 } from '../services/adminApi';
 import { defaultImpactStats, type ActivityGalleryItem, type ImpactStat } from '../services/contentApi';
 import { heroSlides, type HeroSlide, type NewsItem, type Partner, type Recycler } from '../services/mockData';
+import { escapeHtml, normalizeEditableHtml, sanitizeInlineHtml } from '../utils/richText';
 
 type AdminTab = 'overview' | 'news' | 'gallery' | 'headers' | 'stats' | 'testimonials' | 'partners';
 type Notice = { type: 'success' | 'error'; text: string } | null;
+type NewsBlockKind = 'heading' | 'bullet' | 'ordered' | 'quote' | 'paragraph';
 
 interface NewsFormState {
   title: string;
@@ -1426,23 +1438,33 @@ function TextArea({
   );
 }
 
-function EditorButton({
+function ToolbarDivider() {
+  return <span className="mx-1 h-8 w-px bg-slate-200" />;
+}
+
+function IconEditorButton({
   icon: Icon,
-  label,
+  tooltip,
   onClick,
 }: {
   icon: LucideIcon;
-  label: string;
+  tooltip: string;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
-      onClick={onClick}
-      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+      aria-label={tooltip}
+      onMouseDown={(event) => {
+        event.preventDefault();
+        onClick();
+      }}
+      className="group relative inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-slate-700 transition hover:bg-slate-100 hover:text-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-100"
     >
-      <Icon className="h-3.5 w-3.5" />
-      {label}
+      <Icon className="h-5 w-5" />
+      <span className="pointer-events-none absolute -top-11 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-950 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100">
+        {tooltip}
+      </span>
     </button>
   );
 }
@@ -1633,9 +1655,17 @@ function EditableNewsCanvas({
 }) {
   const contentBlocks = splitParagraphs(form.contentText);
 
-  const updateBlock = (index: number, value: string, kind: 'heading' | 'bullet' | 'paragraph') => {
+  const updateBlock = (index: number, value: string, kind: NewsBlockKind) => {
     const nextBlocks = [...contentBlocks];
-    const prefix = kind === 'heading' ? '## ' : kind === 'bullet' ? '- ' : '';
+    const prefix = kind === 'heading'
+      ? '## '
+      : kind === 'bullet'
+        ? '- '
+        : kind === 'ordered'
+          ? '1. '
+          : kind === 'quote'
+            ? '> '
+            : '';
     nextBlocks[index] = `${prefix}${value}`;
     onChange({ contentText: nextBlocks.join('\n\n') });
   };
@@ -1643,6 +1673,59 @@ function EditableNewsCanvas({
   const addBlock = (block: string) => {
     const separator = form.contentText.trim() ? '\n\n' : '';
     onChange({ contentText: `${form.contentText}${separator}${block}` });
+  };
+
+  const getActiveEditor = () => {
+    const activeElement = document.activeElement;
+
+    if (activeElement instanceof HTMLElement && activeElement.dataset.newsBlockIndex !== undefined) {
+      return activeElement;
+    }
+
+    const anchorNode = document.getSelection()?.anchorNode;
+    const anchorElement = anchorNode instanceof HTMLElement ? anchorNode : anchorNode?.parentElement;
+
+    return anchorElement?.closest<HTMLElement>('[data-news-block-index]') || null;
+  };
+
+  const syncEditor = (editor: HTMLElement) => {
+    const blockIndex = Number(editor.dataset.newsBlockIndex);
+    const kind = (editor.dataset.newsBlockKind || 'paragraph') as NewsBlockKind;
+
+    if (Number.isNaN(blockIndex)) return;
+
+    updateBlock(blockIndex, normalizeEditableHtml(editor.innerHTML), kind);
+  };
+
+  const applyInlineCommand = (command: 'bold' | 'italic' | 'strikeThrough' | 'underline' | 'link' | 'code') => {
+    const editor = getActiveEditor();
+
+    if (!editor) {
+      addBlock('Nuevo parrafo de la noticia.');
+      return;
+    }
+
+    editor.focus();
+
+    if (command === 'link') {
+      const selectedText = document.getSelection()?.toString();
+      const url = window.prompt('Pega la URL del enlace', 'https://');
+
+      if (!url) return;
+
+      if (!selectedText) {
+        document.execCommand('insertHTML', false, `<a href="${escapeHtml(url)}">${escapeHtml(url)}</a>`);
+      } else {
+        document.execCommand('createLink', false, url);
+      }
+    } else if (command === 'code') {
+      const selectedText = document.getSelection()?.toString() || 'codigo';
+      document.execCommand('insertHTML', false, `<code>${escapeHtml(selectedText)}</code>`);
+    } else {
+      document.execCommand(command, false);
+    }
+
+    syncEditor(editor);
   };
 
   return (
@@ -1688,43 +1771,75 @@ function EditableNewsCanvas({
           placeholder="Resumen de la noticia"
         />
 
-        <div className="mt-8 flex flex-wrap items-center gap-2">
-          <EditorButton icon={Heading2} label="Subtitulo" onClick={() => addBlock('## Nuevo subtitulo')} />
-          <EditorButton icon={List} label="Punto" onClick={() => addBlock('- Punto destacado de la noticia.')} />
-          <EditorButton icon={FileText} label="Parrafo" onClick={() => addBlock('Nuevo parrafo de la noticia.')} />
+        <div className="mt-8 inline-flex max-w-full flex-wrap items-center gap-1 rounded-xl border border-slate-200 bg-white p-2 shadow-lg shadow-slate-950/5">
+          <IconEditorButton icon={Bold} tooltip="Negrita Ctrl+B" onClick={() => applyInlineCommand('bold')} />
+          <IconEditorButton icon={Italic} tooltip="Cursiva Ctrl+I" onClick={() => applyInlineCommand('italic')} />
+          <IconEditorButton icon={Strikethrough} tooltip="Tachado" onClick={() => applyInlineCommand('strikeThrough')} />
+          <IconEditorButton icon={Underline} tooltip="Subrayado" onClick={() => applyInlineCommand('underline')} />
+          <ToolbarDivider />
+          <IconEditorButton icon={Link2} tooltip="Enlace" onClick={() => applyInlineCommand('link')} />
+          <IconEditorButton icon={Code2} tooltip="Codigo" onClick={() => applyInlineCommand('code')} />
+          <ToolbarDivider />
+          <IconEditorButton icon={Heading2} tooltip="Subtitulo" onClick={() => addBlock('## Nuevo subtitulo')} />
+          <IconEditorButton icon={List} tooltip="Lista con vinetas" onClick={() => addBlock('- Punto destacado de la noticia.')} />
+          <IconEditorButton icon={ListOrdered} tooltip="Lista numerada" onClick={() => addBlock('1. Punto numerado de la noticia.')} />
+          <IconEditorButton icon={Quote} tooltip="Cita destacada" onClick={() => addBlock('> Cita destacada de la noticia.')} />
+          <ToolbarDivider />
+          <IconEditorButton icon={MessageCircle} tooltip="Nota" onClick={() => addBlock('- Nota breve para resaltar contexto.')} />
+          <IconEditorButton icon={Wand2} tooltip="Bloque destacado" onClick={() => addBlock('Nuevo bloque destacado de contenido.')} />
+          <IconEditorButton icon={FileText} tooltip="Parrafo" onClick={() => addBlock('Nuevo parrafo de la noticia.')} />
         </div>
 
         <div className="mt-6 space-y-4">
           {contentBlocks.length === 0 && (
-            <textarea
-              value={form.contentText}
-              onChange={(event) => onChange({ contentText: event.target.value })}
-              rows={5}
-              required
-              className="w-full resize-y rounded-lg border border-dashed border-slate-300 bg-slate-50 px-5 py-4 text-base leading-8 text-slate-700 outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+            <EditableContentBlock
+              index={0}
+              kind="paragraph"
+              value=""
+              onChange={(value) => updateBlock(0, value, 'paragraph')}
               placeholder="Escribe el primer parrafo de la noticia"
+              className="min-h-36 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-5 py-4 text-base leading-8 text-slate-700"
             />
           )}
 
           {contentBlocks.map((block, index) => {
             const isHeading = block.startsWith('## ');
             const isBullet = block.startsWith('- ');
-            const value = block.replace(/^##\s*/, '').replace(/^-\s*/, '');
+            const isOrdered = /^\d+\.\s/.test(block);
+            const isQuote = block.startsWith('> ');
+            const kind = isHeading
+              ? 'heading'
+              : isBullet
+                ? 'bullet'
+                : isOrdered
+                  ? 'ordered'
+                  : isQuote
+                    ? 'quote'
+                    : 'paragraph';
+            const value = block
+              .replace(/^##\s*/, '')
+              .replace(/^-\s*/, '')
+              .replace(/^\d+\.\s*/, '')
+              .replace(/^>\s*/, '');
 
             return (
-              <div key={`${index}-${block.slice(0, 16)}`} className="group relative">
-                <textarea
+              <div key={`content-block-${index}`} className="group relative">
+                <EditableContentBlock
+                  index={index}
+                  kind={kind}
                   value={value}
-                  onChange={(event) =>
-                    updateBlock(index, event.target.value, isHeading ? 'heading' : isBullet ? 'bullet' : 'paragraph')
-                  }
-                  rows={isHeading ? 1 : 3}
+                  onChange={(nextValue) => updateBlock(index, nextValue, kind)}
+                  placeholder={isHeading ? 'Subtitulo de la noticia' : 'Contenido de la noticia'}
                   className={`w-full resize-y rounded-lg border bg-white outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-100 ${
                     isHeading
-                      ? 'border-transparent px-0 py-2 text-3xl font-bold leading-tight text-slate-950'
+                      ? 'min-h-16 border-transparent px-0 py-2 text-3xl font-bold leading-tight text-slate-950'
                       : isBullet
-                        ? 'border-emerald-100 bg-emerald-50/70 px-5 py-4 text-base leading-8 text-slate-700'
-                        : 'border-transparent px-0 py-2 text-lg leading-9 text-slate-700'
+                        ? 'min-h-24 border-emerald-100 bg-emerald-50/70 px-5 py-4 text-base leading-8 text-slate-700'
+                        : isOrdered
+                          ? 'min-h-24 border-sky-100 bg-sky-50/70 px-5 py-4 text-base leading-8 text-slate-700'
+                          : isQuote
+                            ? 'min-h-24 border-l-4 border-l-emerald-600 bg-slate-50 px-5 py-4 text-xl italic leading-9 text-slate-700'
+                            : 'min-h-28 border-transparent px-0 py-2 text-lg leading-9 text-slate-700'
                   }`}
                 />
               </div>
@@ -1735,6 +1850,67 @@ function EditableNewsCanvas({
         <SelectedImageStrip images={[...splitUrls(form.galleryText), ...galleryPreviews]} />
       </div>
     </div>
+  );
+}
+
+function EditableContentBlock({
+  index,
+  kind,
+  value,
+  placeholder,
+  className,
+  onChange,
+}: {
+  index: number;
+  kind: NewsBlockKind;
+  value: string;
+  placeholder: string;
+  className: string;
+  onChange: (value: string) => void;
+}) {
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const nextHtml = sanitizeInlineHtml(value);
+
+    if (document.activeElement !== editor && editor.innerHTML !== nextHtml) {
+      editor.innerHTML = nextHtml;
+    }
+  }, [value]);
+
+  const syncValue = () => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    onChange(normalizeEditableHtml(editor.innerHTML));
+  };
+
+  const handleBlur = () => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const nextValue = normalizeEditableHtml(editor.innerHTML);
+    editor.innerHTML = sanitizeInlineHtml(nextValue);
+    onChange(nextValue);
+  };
+
+  return (
+    <div
+      ref={editorRef}
+      role="textbox"
+      aria-multiline="true"
+      contentEditable
+      suppressContentEditableWarning
+      data-news-block-index={index}
+      data-news-block-kind={kind}
+      data-placeholder={placeholder}
+      onInput={syncValue}
+      onBlur={handleBlur}
+      className={`${className} cursor-text whitespace-pre-wrap break-words outline-none empty:before:text-slate-400 empty:before:content-[attr(data-placeholder)] [&_a]:font-semibold [&_a]:text-emerald-700 [&_a]:underline [&_a]:decoration-emerald-300 [&_a]:underline-offset-4 [&_code]:rounded [&_code]:bg-slate-100 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-base [&_code]:text-slate-900`}
+    />
   );
 }
 
