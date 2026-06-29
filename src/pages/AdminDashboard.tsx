@@ -980,41 +980,23 @@ export function AdminDashboard() {
                       setNewsEditorOpen(false);
                     }}
                   />
-                  <div className="mt-6 grid gap-6 2xl:grid-cols-[1fr_380px]">
-                    <div>
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <TextField label="Titulo" value={newsForm.title} onChange={(value) => setNewsForm({ ...newsForm, title: value })} required />
-                        <TextField label="Categoria" value={newsForm.category} onChange={(value) => setNewsForm({ ...newsForm, category: value })} />
-                        <TextField label="Fecha" type="date" value={newsForm.date} onChange={(value) => setNewsForm({ ...newsForm, date: value })} />
-                        <TextField label="Autor" value={newsForm.author} onChange={(value) => setNewsForm({ ...newsForm, author: value })} />
-                        <TextField label="Tiempo de lectura" value={newsForm.readTime} onChange={(value) => setNewsForm({ ...newsForm, readTime: value })} />
-                        <FileField label="Imagen destacada" onChange={(event) => handleFile(event, setNewsFile)} />
-                        <TextField label="URL de imagen destacada" value={newsForm.featuredImage} onChange={(value) => setNewsForm({ ...newsForm, featuredImage: value })} />
-                        <FileField
-                          label="Galeria de la noticia"
-                          multiple
-                          onChange={(event) => setNewsGalleryFiles(Array.from(event.target.files || []))}
-                        />
-                      </div>
-                      <SelectedImageStrip images={newsGalleryPreviews} />
-                      <div className="mt-4 grid gap-4 md:grid-cols-2">
-                        <TextArea label="Resumen" value={newsForm.excerpt} onChange={(value) => setNewsForm({ ...newsForm, excerpt: value })} required />
-                        <TextArea label="Descripcion" value={newsForm.description} onChange={(value) => setNewsForm({ ...newsForm, description: value })} />
-                      </div>
-                      <div className="mt-4">
-                        <TextArea label="URLs de galeria guardadas" value={newsForm.galleryText} onChange={(value) => setNewsForm({ ...newsForm, galleryText: value })} />
-                      </div>
-                      <RichTextArea
-                        value={newsForm.contentText}
-                        onChange={(value) => setNewsForm({ ...newsForm, contentText: value })}
-                      />
-                      <PublishedToggle
-                        checked={newsForm.published}
-                        onChange={(value) => setNewsForm({ ...newsForm, published: value })}
-                      />
-                      <SubmitButton isBusy={isBusy} label={selectedNewsId ? 'Actualizar noticia' : 'Crear noticia'} />
-                    </div>
-                    <NewsPreview form={newsForm} image={newsImagePreview} galleryPreviews={newsGalleryPreviews} />
+                  <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+                    <EditableNewsCanvas
+                      form={newsForm}
+                      image={newsImagePreview}
+                      galleryPreviews={newsGalleryPreviews}
+                      onChange={(changes) => setNewsForm((current) => ({ ...current, ...changes }))}
+                      onFeaturedImageChange={(event) => handleFile(event, setNewsFile)}
+                    />
+                    <NewsOptionsPanel
+                      form={newsForm}
+                      isBusy={isBusy}
+                      isEditing={Boolean(selectedNewsId)}
+                      onChange={(changes) => setNewsForm((current) => ({ ...current, ...changes }))}
+                      onFeaturedImageChange={(event) => handleFile(event, setNewsFile)}
+                      onGalleryChange={(event) => setNewsGalleryFiles(Array.from(event.target.files || []))}
+                      galleryPreviews={newsGalleryPreviews}
+                    />
                   </div>
                 </form>
                 )}
@@ -1444,39 +1426,6 @@ function TextArea({
   );
 }
 
-function RichTextArea({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  const appendBlock = (block: string) => {
-    const separator = value.trim() ? '\n\n' : '';
-    onChange(`${value}${separator}${block}`);
-  };
-
-  return (
-    <div className="mt-4">
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <span className={labelClass}>Contenido de la noticia</span>
-        <div className="flex flex-wrap gap-2">
-          <EditorButton icon={Heading2} label="Subtitulo" onClick={() => appendBlock('## Nuevo subtitulo')} />
-          <EditorButton icon={List} label="Punto" onClick={() => appendBlock('- Punto destacado de la noticia.')} />
-          <EditorButton icon={FileText} label="Parrafo" onClick={() => appendBlock('Nuevo parrafo de la noticia.')} />
-        </div>
-      </div>
-      <textarea
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        rows={10}
-        required
-        className={`${inputClass} resize-y`}
-      />
-    </div>
-  );
-}
-
 function EditorButton({
   icon: Icon,
   label,
@@ -1669,6 +1618,171 @@ function ImagePreview({
   );
 }
 
+function EditableNewsCanvas({
+  form,
+  image,
+  galleryPreviews,
+  onChange,
+  onFeaturedImageChange,
+}: {
+  form: NewsFormState;
+  image: string;
+  galleryPreviews: string[];
+  onChange: (changes: Partial<NewsFormState>) => void;
+  onFeaturedImageChange: (event: ChangeEvent<HTMLInputElement>) => void;
+}) {
+  const contentBlocks = splitParagraphs(form.contentText);
+
+  const updateBlock = (index: number, value: string, kind: 'heading' | 'bullet' | 'paragraph') => {
+    const nextBlocks = [...contentBlocks];
+    const prefix = kind === 'heading' ? '## ' : kind === 'bullet' ? '- ' : '';
+    nextBlocks[index] = `${prefix}${value}`;
+    onChange({ contentText: nextBlocks.join('\n\n') });
+  };
+
+  const addBlock = (block: string) => {
+    const separator = form.contentText.trim() ? '\n\n' : '';
+    onChange({ contentText: `${form.contentText}${separator}${block}` });
+  };
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+      <div className="relative min-h-[340px] bg-slate-900">
+        {image ? (
+          <img src={image} alt={form.title || 'Noticia'} className="h-[360px] w-full object-cover opacity-90" />
+        ) : (
+          <div className="flex h-[360px] items-center justify-center bg-slate-100 text-slate-400">
+            <ImagePlus className="h-10 w-10" />
+          </div>
+        )}
+        <label className="absolute bottom-5 right-5 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-slate-900 shadow-lg transition hover:bg-emerald-50 hover:text-emerald-700">
+          <ImagePlus className="h-4 w-4" />
+          Cambiar portada
+          <input type="file" accept="image/*" onChange={onFeaturedImageChange} className="sr-only" />
+        </label>
+      </div>
+
+      <div className="mx-auto max-w-4xl px-6 py-8 sm:px-10">
+        <input
+          value={form.category}
+          onChange={(event) => onChange({ category: event.target.value })}
+          className="inline-flex max-w-xs rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+          placeholder="Categoria"
+        />
+
+        <textarea
+          value={form.title}
+          onChange={(event) => onChange({ title: event.target.value })}
+          rows={2}
+          required
+          className="mt-5 w-full resize-none border-none bg-transparent p-0 text-4xl font-bold leading-tight text-slate-950 outline-none placeholder:text-slate-300 md:text-5xl"
+          placeholder="Titulo de la noticia"
+        />
+
+        <textarea
+          value={form.excerpt}
+          onChange={(event) => onChange({ excerpt: event.target.value })}
+          rows={3}
+          required
+          className="mt-4 w-full resize-y rounded-lg border border-transparent bg-slate-50 px-4 py-3 text-lg leading-8 text-slate-600 outline-none transition focus:border-emerald-200 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+          placeholder="Resumen de la noticia"
+        />
+
+        <div className="mt-8 flex flex-wrap items-center gap-2">
+          <EditorButton icon={Heading2} label="Subtitulo" onClick={() => addBlock('## Nuevo subtitulo')} />
+          <EditorButton icon={List} label="Punto" onClick={() => addBlock('- Punto destacado de la noticia.')} />
+          <EditorButton icon={FileText} label="Parrafo" onClick={() => addBlock('Nuevo parrafo de la noticia.')} />
+        </div>
+
+        <div className="mt-6 space-y-4">
+          {contentBlocks.length === 0 && (
+            <textarea
+              value={form.contentText}
+              onChange={(event) => onChange({ contentText: event.target.value })}
+              rows={5}
+              required
+              className="w-full resize-y rounded-lg border border-dashed border-slate-300 bg-slate-50 px-5 py-4 text-base leading-8 text-slate-700 outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+              placeholder="Escribe el primer parrafo de la noticia"
+            />
+          )}
+
+          {contentBlocks.map((block, index) => {
+            const isHeading = block.startsWith('## ');
+            const isBullet = block.startsWith('- ');
+            const value = block.replace(/^##\s*/, '').replace(/^-\s*/, '');
+
+            return (
+              <div key={`${index}-${block.slice(0, 16)}`} className="group relative">
+                <textarea
+                  value={value}
+                  onChange={(event) =>
+                    updateBlock(index, event.target.value, isHeading ? 'heading' : isBullet ? 'bullet' : 'paragraph')
+                  }
+                  rows={isHeading ? 1 : 3}
+                  className={`w-full resize-y rounded-lg border bg-white outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-100 ${
+                    isHeading
+                      ? 'border-transparent px-0 py-2 text-3xl font-bold leading-tight text-slate-950'
+                      : isBullet
+                        ? 'border-emerald-100 bg-emerald-50/70 px-5 py-4 text-base leading-8 text-slate-700'
+                        : 'border-transparent px-0 py-2 text-lg leading-9 text-slate-700'
+                  }`}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        <SelectedImageStrip images={[...splitUrls(form.galleryText), ...galleryPreviews]} />
+      </div>
+    </div>
+  );
+}
+
+function NewsOptionsPanel({
+  form,
+  isBusy,
+  isEditing,
+  onChange,
+  onFeaturedImageChange,
+  onGalleryChange,
+  galleryPreviews,
+}: {
+  form: NewsFormState;
+  isBusy: boolean;
+  isEditing: boolean;
+  onChange: (changes: Partial<NewsFormState>) => void;
+  onFeaturedImageChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onGalleryChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  galleryPreviews: string[];
+}) {
+  return (
+    <aside className="h-fit rounded-lg border border-slate-200 bg-slate-50 p-5 shadow-sm xl:sticky xl:top-6">
+      <h3 className="text-base font-bold text-slate-950">Opciones de publicacion</h3>
+      <div className="mt-5 space-y-4">
+        <TextField label="Fecha" type="date" value={form.date} onChange={(value) => onChange({ date: value })} />
+        <TextField label="Autor" value={form.author} onChange={(value) => onChange({ author: value })} />
+        <TextField label="Tiempo de lectura" value={form.readTime} onChange={(value) => onChange({ readTime: value })} />
+        <TextArea label="Descripcion SEO" value={form.description} onChange={(value) => onChange({ description: value })} />
+        <FileField label="Imagen destacada" onChange={onFeaturedImageChange} />
+        <TextField
+          label="URL de imagen destacada"
+          value={form.featuredImage}
+          onChange={(value) => onChange({ featuredImage: value })}
+        />
+        <FileField label="Galeria de la noticia" multiple onChange={onGalleryChange} />
+        <SelectedImageStrip images={galleryPreviews} />
+        <TextArea
+          label="URLs de galeria guardadas"
+          value={form.galleryText}
+          onChange={(value) => onChange({ galleryText: value })}
+        />
+        <PublishedToggle checked={form.published} onChange={(value) => onChange({ published: value })} />
+      </div>
+      <SubmitButton isBusy={isBusy} label={isEditing ? 'Actualizar noticia' : 'Crear noticia'} />
+    </aside>
+  );
+}
+
 function SelectedImageStrip({ images }: { images: string[] }) {
   if (!images.length) return null;
 
@@ -1689,79 +1803,6 @@ function SelectedImageStrip({ images }: { images: string[] }) {
       </div>
     </div>
   );
-}
-
-function NewsPreview({
-  form,
-  image,
-  galleryPreviews,
-}: {
-  form: NewsFormState;
-  image: string;
-  galleryPreviews: string[];
-}) {
-  const gallery = splitUrls(form.galleryText);
-  const galleryImages = [...gallery, ...galleryPreviews];
-  const content = splitParagraphs(form.contentText);
-
-  return (
-    <aside className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-100 px-5 py-4">
-        <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">Vista previa</p>
-      </div>
-      {image ? (
-        <img src={image} alt={form.title || 'Noticia'} className="h-56 w-full object-cover" />
-      ) : (
-        <div className="flex h-56 items-center justify-center bg-slate-100 text-slate-400">
-          <ImagePlus className="h-8 w-8" />
-        </div>
-      )}
-      <div className="p-5">
-        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-          {form.category || 'Categoria'}
-        </span>
-        <h3 className="mt-4 text-2xl font-bold leading-tight text-slate-950">
-          {form.title || 'Titulo de la noticia'}
-        </h3>
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          {form.excerpt || 'El resumen aparecera aqui mientras escribes.'}
-        </p>
-        <div className="mt-5 space-y-3">
-          {content.slice(0, 4).map((block, index) => (
-            <PreviewBlock key={`${block}-${index}`} block={block} />
-          ))}
-        </div>
-        {galleryImages.length > 0 && (
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            {galleryImages.slice(0, 3).map((item) => (
-              <img key={item} src={item} alt="Galeria" className="aspect-square rounded-lg object-cover" />
-            ))}
-          </div>
-        )}
-      </div>
-    </aside>
-  );
-}
-
-function PreviewBlock({ block }: { block: string }) {
-  if (block.startsWith('## ')) {
-    return (
-      <h4 className="text-lg font-bold text-slate-950">
-        {block.replace(/^##\s*/, '')}
-      </h4>
-    );
-  }
-
-  if (block.startsWith('- ')) {
-    return (
-      <div className="flex gap-2 rounded-lg bg-emerald-50 p-3 text-sm text-slate-700">
-        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
-        {block.replace(/^-\s*/, '')}
-      </div>
-    );
-  }
-
-  return <p className="text-sm leading-6 text-slate-600">{block}</p>;
 }
 
 function TestimonialPreview({ form, image }: { form: TestimonialFormState; image: string }) {
