@@ -8,6 +8,15 @@ import {
 
 export function ActivitiesGallerySection() {
   const galleryItems = useBackendCollection('/gallery', fallbackGalleryItems);
+  const featuredItem = galleryItems.find((item) => item.featured) || galleryItems[0];
+  const displayItems = featuredItem
+    ? [
+        featuredItem,
+        ...galleryItems
+          .filter((item) => item.id !== featuredItem.id)
+          .slice(0, 4),
+      ]
+    : [];
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-white via-slate-50 to-emerald-50 py-28">
@@ -78,7 +87,10 @@ export function ActivitiesGallerySection() {
         </div>
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-4 lg:grid-rows-2">
-          {galleryItems.map((item, index) => (
+          {displayItems.map((item, index) => {
+            const isFeatured = index === 0;
+
+            return (
             <motion.article
               key={item.id || item.title}
               initial={{ opacity: 0, y: 28 }}
@@ -87,27 +99,33 @@ export function ActivitiesGallerySection() {
               viewport={{ once: true }}
               whileHover={{ y: -6 }}
               className={`group relative overflow-hidden rounded-lg bg-slate-900 shadow-xl shadow-slate-950/10 ${
-                item.featured ? 'lg:col-span-2 lg:row-span-2' : ''
+                isFeatured ? 'lg:col-span-2 lg:row-span-2' : ''
               }`}
             >
               <img
                 src={item.image}
                 alt={item.title}
                 className={`w-full object-cover transition-transform duration-700 group-hover:scale-105 ${
-                  item.featured ? 'h-[480px]' : 'h-[230px]'
+                  isFeatured ? 'h-[500px]' : 'h-[240px]'
                 }`}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/82 via-slate-950/18 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/52 to-slate-950/5" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                 <span className="mb-3 inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-emerald-50 backdrop-blur">
                   {item.category}
                 </span>
-                <h3 className={`${item.featured ? 'text-3xl' : 'text-xl'} font-bold`}>
+                <h3 className={`${isFeatured ? 'text-3xl' : 'text-xl'} font-bold drop-shadow`}>
                   {item.title}
                 </h3>
+                {item.description && (
+                  <p className={`mt-3 leading-6 text-white/88 ${isFeatured ? 'text-base' : 'line-clamp-2 text-sm'}`}>
+                    {item.description}
+                  </p>
+                )}
               </div>
             </motion.article>
-          ))}
+            );
+          })}
         </div>
 
         <motion.div

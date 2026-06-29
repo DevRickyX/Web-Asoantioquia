@@ -2,8 +2,12 @@ import { motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import { Building2, ArrowRight, Users, Handshake } from 'lucide-react';
 import { partners } from '../services/mockData';
+import { useBackendCollection } from '../services/contentApi';
 
 export function PartnersSection() {
+  const partnerItems = useBackendCollection('/partners', partners);
+  const categoryCount = new Set(partnerItems.map((partner) => partner.category).filter(Boolean)).size;
+
   return (
     <section className="py-32 relative overflow-hidden">
       {/* Background with organic shapes */}
@@ -57,7 +61,7 @@ export function PartnersSection() {
               viewport={{ once: true }}
               className="text-center"
             >
-              <div className="text-4xl font-bold text-green-600 mb-2">85+</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">{partnerItems.length}</div>
               <div className="text-gray-600">Empresas Aliadas</div>
             </motion.div>
             <motion.div
@@ -67,7 +71,7 @@ export function PartnersSection() {
               viewport={{ once: true }}
               className="text-center"
             >
-              <div className="text-4xl font-bold text-green-600 mb-2">15</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">{categoryCount}</div>
               <div className="text-gray-600">Sectores Industriales</div>
             </motion.div>
             <motion.div
@@ -77,8 +81,8 @@ export function PartnersSection() {
               viewport={{ once: true }}
               className="text-center"
             >
-              <div className="text-4xl font-bold text-green-600 mb-2">98%</div>
-              <div className="text-gray-600">Satisfacción</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">{partnerItems.length}</div>
+              <div className="text-gray-600">Aliados visibles</div>
             </motion.div>
           </div>
         </motion.div>
@@ -92,7 +96,7 @@ export function PartnersSection() {
           className="bg-white rounded-3xl shadow-xl p-12 mb-16"
         >
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-            {partners.map((partner, index) => (
+            {partnerItems.map((partner, index) => (
               <motion.div
                 key={partner.id}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -102,10 +106,22 @@ export function PartnersSection() {
                 whileHover={{ scale: 1.1, y: -5 }}
                 className="group relative"
               >
-                <div className="bg-gray-50 rounded-2xl p-6 h-24 flex items-center justify-center group-hover:bg-green-50 transition-all duration-300 border border-gray-100 group-hover:border-green-200">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-                    <Building2 className="h-8 w-8 text-white" />
-                  </div>
+                <div className="bg-gray-50 rounded-2xl p-5 h-32 flex flex-col items-center justify-center group-hover:bg-green-50 transition-all duration-300 border border-gray-100 group-hover:border-green-200">
+                  {partner.logo ? (
+                    <img
+                      src={partner.logo}
+                      alt={partner.name}
+                      className="max-h-16 max-w-full object-contain"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                      <Building2 className="h-8 w-8 text-white" />
+                    </div>
+                  )}
+                  <span className="mt-3 line-clamp-1 text-center text-xs font-semibold text-slate-700">
+                    {partner.name}
+                  </span>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-green-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.div>

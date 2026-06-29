@@ -86,10 +86,8 @@ export function NewsDetail() {
 
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[0.68fr_0.32fr] lg:px-8">
         <div className="max-w-3xl">
-          {article.content.map((paragraph) => (
-            <p key={paragraph} className="mb-7 text-lg leading-9 text-slate-700">
-              {paragraph}
-            </p>
+          {article.content.map((block, index) => (
+            <ContentBlock key={`${block}-${index}`} block={block} />
           ))}
         </div>
 
@@ -113,5 +111,30 @@ export function NewsDetail() {
         </aside>
       </div>
     </article>
+  );
+}
+
+function ContentBlock({ block }: { block: string }) {
+  if (block.startsWith('## ')) {
+    return (
+      <h2 className="mb-4 mt-10 text-3xl font-bold leading-tight text-slate-950">
+        {block.replace(/^##\s*/, '')}
+      </h2>
+    );
+  }
+
+  if (block.startsWith('- ')) {
+    return (
+      <div className="mb-4 flex gap-3 rounded-lg border border-emerald-100 bg-emerald-50/70 p-4 text-slate-700">
+        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
+        <p className="text-lg leading-8">{block.replace(/^-\s*/, '')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <p className="mb-7 text-lg leading-9 text-slate-700">
+      {block}
+    </p>
   );
 }

@@ -61,6 +61,9 @@ export interface Partner {
   name: string;
   logo: string;
   category: string;
+  website?: string;
+  description?: string;
+  published?: boolean;
 }
 
 export interface HeroSlide {

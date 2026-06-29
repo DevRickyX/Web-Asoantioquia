@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { HeroSlide, NewsItem, Recycler } from './mockData';
+import type { HeroSlide, NewsItem, Partner, Recycler } from './mockData';
+import type { ImpactStat } from '../components/StatsSection';
 
 export interface ActivityGalleryItem {
   id: string;
@@ -52,6 +53,15 @@ export interface SiteSetting<T> {
 }
 
 type BackendCollection = NewsItem[] | Recycler[] | ActivityGalleryItem[] | HeroSlide[];
+export interface LandingMetrics {
+  partners: number;
+  gallery: number;
+  news: number;
+  testimonials: number;
+  stats: ImpactStat[];
+}
+
+type BackendList = BackendCollection | Partner[];
 
 export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:4000';
 
@@ -65,7 +75,7 @@ export async function getJson<T>(path: string): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export function useBackendCollection<T extends BackendCollection>(
+export function useBackendCollection<T extends BackendList>(
   path: string,
   fallback: T,
 ) {

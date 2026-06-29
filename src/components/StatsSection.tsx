@@ -1,43 +1,78 @@
 import { motion } from 'framer-motion';
 import { Building2, Leaf, Recycle, TrendingUp, Users } from 'lucide-react';
 import { companyInfo } from '../services/mockData';
+import { type LandingMetrics, useBackendItem } from '../services/contentApi';
 
-const stats = [
+export interface ImpactStat {
+  icon: 'Recycle' | 'Users' | 'Building2' | 'Leaf';
+  value: string;
+  label: string;
+  detail: string;
+}
+
+const statIcons = {
+  Recycle,
+  Users,
+  Building2,
+  Leaf,
+} as const;
+
+const statStyles = [
   {
-    icon: Recycle,
-    value: companyInfo.impact.tonnagesRecycled.toLocaleString('es-CO'),
-    label: 'Toneladas recicladas',
-    detail: 'Material recuperado y reintegrado a cadenas productivas.',
     accent: 'from-emerald-500 to-teal-500',
     iconBg: 'bg-emerald-50 text-emerald-700',
   },
   {
-    icon: Users,
-    value: `${companyInfo.impact.jobsCreated}+`,
-    label: 'Empleos generados',
-    detail: 'Oportunidades de trabajo digno para recicladores de oficio.',
     accent: 'from-sky-500 to-cyan-500',
     iconBg: 'bg-sky-50 text-sky-700',
   },
   {
-    icon: Building2,
-    value: `${companyInfo.impact.companiesPartnered}+`,
-    label: 'Empresas aliadas',
-    detail: 'Organizaciones vinculadas a programas de economía circular.',
     accent: 'from-violet-500 to-fuchsia-500',
     iconBg: 'bg-violet-50 text-violet-700',
   },
   {
-    icon: Leaf,
-    value: `${companyInfo.impact.communitiesBenefited}`,
-    label: 'Comunidades beneficiadas',
-    detail: 'Sectores acompañados con formación, rutas y procesos sostenibles.',
     accent: 'from-amber-400 to-orange-500',
     iconBg: 'bg-amber-50 text-amber-700',
   },
 ] as const;
 
+export const defaultImpactStats: ImpactStat[] = [
+  {
+    icon: 'Recycle',
+    value: companyInfo.impact.tonnagesRecycled.toLocaleString('es-CO'),
+    label: 'Toneladas recicladas',
+    detail: 'Material recuperado y reintegrado a cadenas productivas.',
+  },
+  {
+    icon: 'Users',
+    value: `${companyInfo.impact.jobsCreated}+`,
+    label: 'Empleos generados',
+    detail: 'Oportunidades de trabajo digno para recicladores de oficio.',
+  },
+  {
+    icon: 'Building2',
+    value: `${companyInfo.impact.companiesPartnered}+`,
+    label: 'Empresas aliadas',
+    detail: 'Organizaciones vinculadas a programas de economia circular.',
+  },
+  {
+    icon: 'Leaf',
+    value: `${companyInfo.impact.communitiesBenefited}`,
+    label: 'Comunidades beneficiadas',
+    detail: 'Sectores acompanados con formacion, rutas y procesos sostenibles.',
+  },
+];
+
 export function StatsSection() {
+  const metrics = useBackendItem<LandingMetrics>('/metrics/landing', {
+    partners: companyInfo.impact.companiesPartnered,
+    gallery: 0,
+    news: 0,
+    testimonials: 0,
+    stats: defaultImpactStats,
+  });
+  const stats = metrics?.stats?.length ? metrics.stats : defaultImpactStats;
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-cyan-50 py-24">
       <div className="absolute inset-0 opacity-45 [background-image:radial-gradient(circle_at_1px_1px,rgba(15,23,42,.16)_1px,transparent_0)] [background-size:30px_30px]" />
@@ -83,7 +118,7 @@ export function StatsSection() {
               Cifras de impacto
             </span>
             <h2 className="mt-6 text-4xl font-bold leading-tight text-slate-950 md:text-5xl">
-              Resultados que respaldan la operación sostenible
+              Resultados que respaldan la operacion sostenible
             </h2>
             <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
               Datos clave para ver el alcance ambiental, social y empresarial
@@ -107,11 +142,12 @@ export function StatsSection() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {stats.map((item, index) => {
-              const Icon = item.icon;
+              const Icon = statIcons[item.icon] || Recycle;
+              const style = statStyles[index % statStyles.length];
 
               return (
                 <motion.article
-                  key={item.label}
+                  key={`${item.label}-${index}`}
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: index * 0.08 }}
@@ -119,13 +155,13 @@ export function StatsSection() {
                   whileHover={{ y: -6 }}
                   className="group relative flex h-full min-h-[220px] flex-col overflow-hidden rounded-lg border border-slate-200 bg-white p-6 shadow-lg shadow-slate-950/5 transition-shadow duration-300 hover:shadow-2xl hover:shadow-slate-950/10"
                 >
-                  <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accent}`} />
+                  <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${style.accent}`} />
                   <div className="mb-6 flex items-center justify-between gap-4">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${item.iconBg}`}>
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${style.iconBg}`}>
                       <Icon className="h-6 w-6" />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                      0{index + 1}
+                      {String(index + 1).padStart(2, '0')}
                     </span>
                   </div>
                   <div className="text-4xl font-bold text-slate-950">{item.value}</div>
