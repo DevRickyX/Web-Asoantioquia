@@ -53,7 +53,7 @@ export interface SiteSetting<T> {
 
 type BackendCollection = NewsItem[] | Recycler[] | ActivityGalleryItem[] | HeroSlide[];
 
-export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:4000';
 
 export async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${apiBaseUrl}/api${path}`);
