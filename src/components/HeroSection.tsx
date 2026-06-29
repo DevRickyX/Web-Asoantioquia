@@ -12,6 +12,7 @@ import {
   Users,
 } from 'lucide-react';
 import { heroSlides } from '../services/mockData';
+import { useBackendSetting } from '../services/contentApi';
 
 const heroMetrics = [
   { icon: Recycle, value: '12.5K', label: 'toneladas recicladas' },
@@ -20,28 +21,35 @@ const heroMetrics = [
 ] as const;
 
 export function HeroSection() {
+  const slides = useBackendSetting('hero-slides', heroSlides);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   useEffect(() => {
-    if (!isAutoPlaying) return undefined;
+    if (!isAutoPlaying || slides.length === 0) return undefined;
 
     const interval = setInterval(() => {
-      setCurrentSlideIndex((prev) => (prev + 1) % heroSlides.length);
+      setCurrentSlideIndex((prev) => (prev + 1) % slides.length);
     }, 7000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, slides.length]);
+
+  useEffect(() => {
+    if (currentSlideIndex >= slides.length) {
+      setCurrentSlideIndex(0);
+    }
+  }, [currentSlideIndex, slides.length]);
 
   const nextSlide = () => {
-    setCurrentSlideIndex((prev) => (prev + 1) % heroSlides.length);
+    setCurrentSlideIndex((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlideIndex((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    setCurrentSlideIndex((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  const currentSlide = heroSlides[currentSlideIndex];
+  const currentSlide = slides[currentSlideIndex] || heroSlides[0];
 
   return (
     <section className="relative isolate min-h-[70svh] overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-950 to-emerald-900 md:h-[600px] md:min-h-0">
@@ -141,7 +149,7 @@ export function HeroSection() {
           </button>
 
           <div className="flex items-center gap-1 px-1">
-            {heroSlides.map((slide, index) => (
+            {slides.map((slide, index) => (
               <button
                 key={slide.title}
                 type="button"

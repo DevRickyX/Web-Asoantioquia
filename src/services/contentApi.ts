@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { NewsItem, Recycler } from './mockData';
+import type { HeroSlide, NewsItem, Recycler } from './mockData';
 
 export interface ActivityGalleryItem {
   id: string;
@@ -44,11 +44,18 @@ export const fallbackGalleryItems: ActivityGalleryItem[] = [
   },
 ];
 
-type BackendCollection = NewsItem[] | Recycler[] | ActivityGalleryItem[];
+export interface SiteSetting<T> {
+  key: string;
+  value: T;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+type BackendCollection = NewsItem[] | Recycler[] | ActivityGalleryItem[] | HeroSlide[];
 
-async function getJson<T>(path: string): Promise<T> {
+export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
+export async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${apiBaseUrl}/api${path}`);
 
   if (!response.ok) {
@@ -115,4 +122,32 @@ export function useBackendItem<T>(
   }, [fallback, path]);
 
   return item;
+}
+
+export function useBackendSetting<T>(key: string, fallback: T) {
+  const [value, setValue] = useState<T>(fallback);
+
+  useEffect(() => {
+    let active = true;
+
+    getJson<SiteSetting<T>>(`/settings/${key}`)
+      .then((setting) => {
+        if (
+          active &&
+          setting.value &&
+          (!Array.isArray(setting.value) || setting.value.length > 0)
+        ) {
+          setValue(setting.value);
+        }
+      })
+      .catch(() => {
+        if (active) setValue(fallback);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [fallback, key]);
+
+  return value;
 }
