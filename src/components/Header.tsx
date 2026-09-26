@@ -12,7 +12,7 @@ const companyLinks = [
 const mainLinks = [
   { to: "/", label: "Inicio" },
   { to: "/servicios", label: "Servicios" },
-  { to: "/impacto", label: "Impacto" },
+  { to: "/impacto", label: "Acciones" },
   { to: "/sedes", label: "Sedes" },
 ] as const;
 
@@ -85,7 +85,7 @@ export function Header() {
               />
             </span>
             <span className="hidden text-xl font-bold leading-tight text-slate-900 sm:block">
-              Asoantioquia
+              Asoantioquia | Turbo
             </span>
           </Link>
 

@@ -40,7 +40,7 @@ export function LocationsSection() {
   );
 
   return (
-    <section className="py-32 relative overflow-hidden">
+    <section className="relative overflow-hidden py-24">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-green-50">
         {/* Floating particles */}
@@ -70,7 +70,7 @@ export function LocationsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="mb-12 text-center"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -80,7 +80,7 @@ export function LocationsSection() {
             className="inline-flex items-center bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-full text-sm font-semibold mb-8"
           >
             <MapPin className="mr-2 h-4 w-4" />
-            Nuestras Ubicaciones
+            Nuestra ubicación
           </motion.div>
           
           <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -89,7 +89,7 @@ export function LocationsSection() {
           </h2>
           
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Estratégicamente ubicados para brindar el mejor servicio en la región caribeña y antioqueña
+            Estamos en Turbo para brindar atención y acompañamiento en el Urabá antioqueño.
           </p>
         </motion.div>
 
@@ -99,13 +99,13 @@ export function LocationsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           viewport={{ once: true }}
-          className="mb-20"
+          className="mb-12"
         >
           <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
             <div className="h-96 relative">
               <MapContainer
-                center={[8.4, -75.8]}
-                zoom={8}
+                center={[locations[0].coordinates.lat, locations[0].coordinates.lng]}
+                zoom={12}
                 className="h-full w-full"
                 zoomControl={false}
               >
@@ -143,7 +143,7 @@ export function LocationsSection() {
         </motion.div>
 
         {/* Location Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8">
           {locations.map((location, index) => (
             <motion.div
               key={location.id}
@@ -151,7 +151,7 @@ export function LocationsSection() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: index * 0.2 }}
               viewport={{ once: true }}
-              whileHover={{ y: -10 }}
+              whileHover={{ y: -6 }}
               className="group relative"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-green-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -173,7 +173,7 @@ export function LocationsSection() {
                     </div>
                   </div>
 
-                  <div className="space-y-4 mb-8">
+                  <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
                     <motion.div 
                       whileHover={{ x: 5 }}
                       className="flex items-start group/item"
@@ -259,7 +259,7 @@ export function LocationsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
           viewport={{ once: true }}
-          className="mt-20 text-center"
+          className="mt-16 text-center"
         >
           <div className="relative bg-gradient-to-r from-green-600 via-green-700 to-green-800 rounded-3xl p-12 overflow-hidden">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=&#34;60&#34; height=&#34;60&#34; viewBox=&#34;0 0 60 60&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;%3E%3Cg fill=&#34;none&#34; fill-rule=&#34;evenodd&#34;%3E%3Cg fill=&#34;%23ffffff&#34; fill-opacity=&#34;0.1&#34;%3E%3Ccircle cx=&#34;30&#34; cy=&#34;30&#34; r=&#34;4&#34;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>

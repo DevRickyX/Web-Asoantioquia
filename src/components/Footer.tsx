@@ -12,7 +12,7 @@ import {
 const footerLinks = [
   { to: '/', label: 'Inicio' },
   { to: '/servicios', label: 'Servicios' },
-  { to: '/impacto', label: 'Impacto' },
+  { to: '/impacto', label: 'Acciones' },
   { to: '/sedes', label: 'Sedes' },
   { to: '/responsabilidad-social', label: 'Responsabilidad Social' },
 ] as const;
@@ -109,11 +109,13 @@ export function Footer() {
             <div className="space-y-3 text-sm text-emerald-50/75">
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-emerald-300" />
-                <span>+57 (4) 789-1234</span>
+                <a href="tel:+573023119180" className="transition-colors hover:text-white">
+                  +57 302 311 9180
+                </a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-emerald-300" />
-                <span>info@asoantioquia.org</span>
+                <span>contactenos@asoantioquiaturbo.com</span>
               </div>
             </div>
           </div>
@@ -125,11 +127,7 @@ export function Footer() {
             <div className="space-y-3 text-sm text-emerald-50/75">
               <div className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 text-emerald-300" />
-                <span>Montería, Córdoba</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <MapPin className="mt-0.5 h-4 w-4 text-emerald-300" />
-                <span>Turbo, Antioquia</span>
+                <span>Calle 102 #10-61/71, barrio Buenos Aires, Turbo, Antioquia</span>
               </div>
             </div>
           </div>

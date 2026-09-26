@@ -1,13 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { ArrowRight, Camera, Images, Recycle, Users } from 'lucide-react';
-import {
-  fallbackGalleryItems,
-  useBackendCollection,
-} from '../services/contentApi';
+import { fallbackGalleryItems } from '../services/contentApi';
 
 export function ActivitiesGallerySection() {
-  const galleryItems = useBackendCollection('/gallery', fallbackGalleryItems);
+  const galleryItems = fallbackGalleryItems;
   const featuredItem = galleryItems.find((item) => item.featured) || galleryItems[0];
   const displayItems = featuredItem
     ? [
@@ -139,7 +136,7 @@ export function ActivitiesGallerySection() {
             to="/responsabilidad-social"
             className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-slate-950/15 transition-colors duration-200 hover:bg-emerald-800"
           >
-            Ver impacto social
+            Conocer nuestras acciones
             <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>

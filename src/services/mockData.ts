@@ -1,3 +1,5 @@
+import newsData from './news.json';
+
 export interface Service {
   id: string;
   title: string;
@@ -96,10 +98,10 @@ export const services: Service[] = [
   },
   {
     id: '3',
-    title: 'Capacitación Ambiental',
-    description: 'Programas de educación ambiental para comunidades, empresas e instituciones educativas.',
+    title: 'Educación y Sensibilización Ambiental',
+    description: 'Espacios de conversación y orientación para promover la separación adecuada de residuos y el cuidado del entorno.',
     icon: 'GraduationCap',
-    image: 'https://images.pexels.com/photos/8348740/pexels-photo-8348740.jpeg?auto=compress&cs=tinysrgb&w=900'
+    image: '/images/noticias/reconocimiento-recicladores-2026/reconocimiento-recicladores-2026-03.jpeg'
   },
   {
     id: '4',
@@ -110,77 +112,9 @@ export const services: Service[] = [
   }
 ];
 
-export const news: NewsItem[] = [
-  {
-    id: '1',
-    slug: 'nueva-planta-clasificacion-monteria',
-    title: 'Nueva planta de clasificación fortalece la economía circular',
-    excerpt: 'Un espacio operativo preparado para procesar más material aprovechable, crear empleo formal y mejorar la trazabilidad de los residuos.',
-    description: 'Inauguramos una planta con capacidad para procesar 50 toneladas diarias de material reciclable, generando nuevas oportunidades laborales para recicladores de oficio.',
-    date: '2024-01-15',
-    featuredImage: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=1400',
-    image: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=900',
-    category: 'Infraestructura',
-    author: 'Equipo Asoantioquia',
-    readTime: '4 min',
-    content: [
-      'La nueva planta de clasificación fue diseñada para ordenar, pesar y preparar materiales reciclables con mayor eficiencia. Este avance permite que empresas y comunidades tengan una ruta más clara para entregar sus residuos aprovechables.',
-      'El proyecto también fortalece el trabajo de los recicladores de oficio, quienes contarán con mejores condiciones operativas, herramientas de trazabilidad y procesos más seguros para la separación del material.',
-      'Durante los próximos meses se integrarán nuevas rutas de recolección y jornadas de formación para que más barrios, instituciones y aliados empresariales participen activamente en el modelo de economía circular.'
-    ],
-    gallery: [
-      'https://images.pexels.com/photos/802221/pexels-photo-802221.jpeg?auto=compress&cs=tinysrgb&w=900',
-      'https://images.pexels.com/photos/8471831/pexels-photo-8471831.jpeg?auto=compress&cs=tinysrgb&w=900',
-      'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=900'
-    ]
-  },
-  {
-    id: '2',
-    slug: 'programa-educacion-ambiental-escolar',
-    title: 'Programa de educación ambiental llega a instituciones educativas',
-    excerpt: 'Talleres prácticos, material pedagógico y jornadas de separación en la fuente para estudiantes y docentes.',
-    description: 'Lanzamos un programa educativo que beneficiará a más de 10.000 estudiantes con talleres interactivos sobre reciclaje, consumo responsable y cuidado del entorno.',
-    date: '2024-01-10',
-    featuredImage: 'https://images.pexels.com/photos/8348740/pexels-photo-8348740.jpeg?auto=compress&cs=tinysrgb&w=1400',
-    image: 'https://images.pexels.com/photos/8348740/pexels-photo-8348740.jpeg?auto=compress&cs=tinysrgb&w=900',
-    category: 'Educación',
-    author: 'Área Social',
-    readTime: '3 min',
-    content: [
-      'La educación ambiental es una herramienta clave para transformar hábitos desde la escuela. Por eso, el programa combina actividades lúdicas, retos de clasificación y acompañamiento a docentes.',
-      'Cada institución participante recibe una ruta de trabajo ajustada a su contexto, con guías para separar en la fuente, medir avances y vincular a las familias en prácticas sostenibles.',
-      'El objetivo es que los estudiantes comprendan el valor social y ambiental del reciclaje, y que puedan replicar esos aprendizajes en sus hogares y comunidades.'
-    ],
-    gallery: [
-      'https://images.pexels.com/photos/8471831/pexels-photo-8471831.jpeg?auto=compress&cs=tinysrgb&w=900',
-      'https://images.pexels.com/photos/8471985/pexels-photo-8471985.jpeg?auto=compress&cs=tinysrgb&w=900',
-      'https://images.pexels.com/photos/8348740/pexels-photo-8348740.jpeg?auto=compress&cs=tinysrgb&w=900'
-    ]
-  },
-  {
-    id: '3',
-    slug: 'alianza-estrategica-empresas-locales',
-    title: 'Alianzas empresariales impulsan programas de reciclaje corporativo',
-    excerpt: 'Nuevos convenios conectan a empresas locales con rutas de aprovechamiento, medición de impacto y formación para equipos internos.',
-    description: 'Firmamos convenios con 15 empresas locales para implementar programas de reciclaje corporativo y economía circular con indicadores de impacto.',
-    date: '2024-01-05',
-    featuredImage: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1400',
-    image: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=900',
-    category: 'Alianzas',
-    author: 'Dirección de Proyectos',
-    readTime: '5 min',
-    content: [
-      'Las alianzas con empresas son una oportunidad para cerrar ciclos de materiales y convertir las metas ambientales en acciones medibles. Cada convenio incluye diagnóstico, capacitación y seguimiento.',
-      'Asoantioquia acompaña a los equipos internos para mejorar la separación en la fuente, definir puntos de acopio y generar reportes periódicos sobre material recuperado.',
-      'Este modelo permite que las organizaciones reduzcan residuos enviados a disposición final mientras apoyan la formalización y dignificación del trabajo reciclador.'
-    ],
-    gallery: [
-      'https://images.pexels.com/photos/3184432/pexels-photo-3184432.jpeg?auto=compress&cs=tinysrgb&w=900',
-      'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=900',
-      'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=900'
-    ]
-  }
-];
+export const news = [...(newsData as NewsItem[])].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+);
 
 export const recyclers: Recycler[] = [
   {
@@ -220,7 +154,7 @@ export const locations: Location[] = [
     summary: 'Centro operativo para coordinación de rutas, clasificación, educación ambiental y atención a aliados empresariales.',
     address: 'Carrera 5 #12-34, Barrio La Granja, Montería, Córdoba',
     phone: '+57 (4) 789-1234',
-    email: 'monteria@asoantioquia.org',
+    email: 'contactenos@asoantioquiaturbo.com',
     hours: 'Lunes a Viernes: 7:00 AM - 5:00 PM',
     coordinates: { lat: 8.7479, lng: -75.8814 },
     heroImage: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=1600',
@@ -258,9 +192,9 @@ export const locations: Location[] = [
     region: 'Antioquia',
     type: 'Sede regional',
     summary: 'Punto regional para acompañamiento comunitario, rutas de recuperación y fortalecimiento de recicladores en el Urabá.',
-    address: 'Calle 8 #15-20, Centro, Turbo, Antioquia',
-    phone: '+57 (4) 789-5678',
-    email: 'turbo@asoantioquia.org',
+    address: 'Calle 102 #10-61/71, barrio Buenos Aires, Turbo, Antioquia',
+    phone: '+57 302 311 9180',
+    email: 'contactenos@asoantioquiaturbo.com',
     hours: 'Lunes a Viernes: 8:00 AM - 4:00 PM',
     coordinates: { lat: 8.0936, lng: -76.7350 },
     heroImage: 'https://images.pexels.com/photos/8471985/pexels-photo-8471985.jpeg?auto=compress&cs=tinysrgb&w=1600',
@@ -290,7 +224,7 @@ export const locations: Location[] = [
     ],
     serviceAreas: ['Turbo', 'Apartadó', 'Carepa', 'Chigorodó'],
   },
-];
+].filter((location) => location.slug === 'turbo');
 
 export const partners: Partner[] = [
   {
@@ -333,31 +267,31 @@ export const partners: Partner[] = [
 
 export const heroSlides: HeroSlide[] = [
   {
-    image: 'https://images.pexels.com/photos/802221/pexels-photo-802221.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    eyebrow: 'Economía circular con impacto social',
+    image: '/images/noticias/reconocimiento-recicladores-2026/reconocimiento-recicladores-2026-03.jpeg',
+    eyebrow: 'Acciones con la comunidad recicladora',
     title: 'Asoantioquia',
-    subtitle: 'transforma residuos en oportunidades',
-    description: 'Conectamos empresas, comunidades y recicladores de oficio para recuperar materiales, dignificar el trabajo ambiental y cuidar el territorio.',
-    statValue: '12.5K',
-    statLabel: 'toneladas recuperadas'
+    subtitle: 'reconoce a quienes cuidan el territorio',
+    description: 'Acompañamos a los recicladores de oficio con acciones de reconocimiento, escucha y sensibilización ambiental en Turbo.',
+    statValue: '',
+    statLabel: ''
   },
   {
     image: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    eyebrow: 'Operación técnica y trazable',
-    title: 'Reciclaje organizado',
-    subtitle: 'para empresas y comunidades',
-    description: 'Diseñamos rutas, capacitaciones y procesos de clasificación para que cada material aprovechable vuelva a la cadena productiva.',
-    statValue: '85',
-    statLabel: 'empresas aliadas'
+    eyebrow: 'Separar para volver a aprovechar',
+    title: 'Reciclar importa',
+    subtitle: 'porque los residuos pueden convertirse en recursos',
+    description: 'La separación en la fuente ayuda a conservar materiales, cuidar el entorno y facilitar el trabajo de quienes los recuperan cada día.',
+    statValue: '',
+    statLabel: ''
   },
   {
-    image: 'https://images.pexels.com/photos/8471985/pexels-photo-8471985.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    eyebrow: 'Cultura ambiental en acción',
-    title: 'Educación ambiental',
-    subtitle: 'que cambia hábitos',
-    description: 'Acompañamos instituciones, hogares y organizaciones con programas prácticos de separación en la fuente y consumo responsable.',
-    statValue: '25',
-    statLabel: 'comunidades beneficiadas'
+    image: '/images/noticias/almuerzo-sensibilizacion-recicladores-2026/actividad-almuerzo-sensibilizacion-13.jpeg',
+    eyebrow: 'Encuentros que construyen comunidad',
+    title: 'Compartir y aprender',
+    subtitle: 'también fortalece el oficio reciclador',
+    description: 'Creamos espacios cercanos para conversar sobre el ambiente, compartir experiencias y reconocer el trabajo de la comunidad recicladora.',
+    statValue: '',
+    statLabel: ''
   }
 ];
 

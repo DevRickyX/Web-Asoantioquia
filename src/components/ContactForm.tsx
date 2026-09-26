@@ -16,15 +16,47 @@ interface ContactFormProps {
   isPartnerForm?: boolean;
 }
 
+const formSubmitEndpoint = import.meta.env.VITE_FORMSUBMIT_ENDPOINT;
+const publicSiteUrl = import.meta.env.VITE_PUBLIC_SITE_URL;
+
 export function ContactForm({ isPartnerForm = false }: ContactFormProps) {
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
 
-  const onSubmit = (data: FormData) => {
-    console.log('Form data:', data);
-    setIsSubmitted(true);
-    reset();
-    setTimeout(() => setIsSubmitted(false), 3000);
+  const onSubmit = async (data: FormData) => {
+    const subject = isPartnerForm
+      ? `Propuesta de alianza: ${data.company || data.name}`
+      : data.subject;
+
+    setSubmissionStatus('sending');
+
+    try {
+      const response = await fetch(formSubmitEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: data.name,
+          correo: data.email,
+          telefono: data.phone,
+          empresa: data.company || 'No especificada',
+          asunto: subject,
+          mensaje: data.message,
+          sitio_web: publicSiteUrl,
+          _subject: `Nuevo mensaje desde la web: ${subject}`,
+          _template: 'table',
+        }),
+      });
+
+      if (!response.ok) throw new Error('No se pudo enviar el formulario');
+
+      setSubmissionStatus('success');
+      reset();
+    } catch {
+      setSubmissionStatus('error');
+    }
   };
 
   const formTitle = isPartnerForm ? 'Únete como Aliado Estratégico' : 'Contáctanos';
@@ -121,7 +153,7 @@ export function ContactForm({ isPartnerForm = false }: ContactFormProps) {
                     {...register('phone')}
                     type="tel"
                     className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 bg-gray-50 focus:bg-white"
-                    placeholder="+57 300 123 4567"
+                    placeholder="+57 302 311 9180"
                   />
                 </div>
 
@@ -205,20 +237,24 @@ export function ContactForm({ isPartnerForm = false }: ContactFormProps) {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
+                disabled={submissionStatus === 'sending'}
                 className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 rounded-2xl font-semibold flex items-center justify-center transition-all duration-300 shadow-xl hover:shadow-2xl"
               >
                 <Send className="mr-3 h-5 w-5" />
-                {isPartnerForm ? 'Enviar Propuesta' : 'Enviar Mensaje'}
+                {submissionStatus === 'sending'
+                  ? 'Enviando...'
+                  : isPartnerForm ? 'Enviar Propuesta' : 'Enviar Mensaje'}
               </motion.button>
 
-              {isSubmitted && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-2xl"
-                >
-                  ¡Mensaje enviado exitosamente! Te contactaremos pronto.
-                </motion.div>
+              {submissionStatus === 'success' && (
+                <p className="rounded-2xl border border-green-200 bg-green-50 px-6 py-4 text-center text-sm text-green-700">
+                  Mensaje enviado correctamente. Nos pondremos en contacto contigo.
+                </p>
+              )}
+              {submissionStatus === 'error' && (
+                <p className="rounded-2xl border border-red-200 bg-red-50 px-6 py-4 text-center text-sm text-red-700">
+                  No pudimos enviar el mensaje. Escríbenos a contactenos@asoantioquiaturbo.com.
+                </p>
               )}
             </form>
           </motion.div>
@@ -246,7 +282,7 @@ export function ContactForm({ isPartnerForm = false }: ContactFormProps) {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">Llámanos</h4>
-                    <p className="text-gray-600">+57 (4) 789-1234</p>
+                    <a href="tel:+573023119180" className="text-gray-600 hover:text-green-700">+57 302 311 9180</a>
                   </div>
                 </motion.div>
 
@@ -259,7 +295,7 @@ export function ContactForm({ isPartnerForm = false }: ContactFormProps) {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">WhatsApp</h4>
-                    <p className="text-gray-600">+57 300 123 4567</p>
+                    <a href="https://wa.me/573023119180" className="text-gray-600 hover:text-green-700">+57 302 311 9180</a>
                   </div>
                 </motion.div>
 
@@ -272,7 +308,7 @@ export function ContactForm({ isPartnerForm = false }: ContactFormProps) {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">Email</h4>
-                    <p className="text-gray-600">info@asoantioquia.org</p>
+                    <p className="text-gray-600">contactenos@asoantioquiaturbo.com</p>
                   </div>
                 </motion.div>
 
@@ -285,7 +321,7 @@ export function ContactForm({ isPartnerForm = false }: ContactFormProps) {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">Oficina Principal</h4>
-                    <p className="text-gray-600">Carrera 5 #12-34, Montería, Córdoba</p>
+                    <p className="text-gray-600">Calle 102 #10-61/71, barrio Buenos Aires, Turbo, Antioquia</p>
                   </div>
                 </motion.div>
               </div>

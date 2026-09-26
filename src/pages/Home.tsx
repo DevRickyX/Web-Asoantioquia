@@ -1,23 +1,19 @@
 import { HeroSection } from '../components/HeroSection';
-import { StatsSection } from '../components/StatsSection';
-import { ServicesSection } from '../components/ServicesSection';
+import { RecyclingImportanceSection } from '../components/RecyclingImportanceSection';
 import { NewsSection } from '../components/NewsSection';
 import { ContactForm } from '../components/ContactForm';
-import { RecyclersSection } from '../components/RecyclersSection';
 import { LocationsSection } from '../components/LocationsSection';
-import { PartnersSection } from '../components/PartnersSection';
 import { ActivitiesGallerySection } from '../components/ActivitiesGallerySection';
 
 export function Home() {
   return (
     <>
       <HeroSection />
-      <StatsSection />
-      <ServicesSection />
-      <PartnersSection />
+      {/* Cifras de impacto ocultas hasta contar con datos verificados. */}
+      <RecyclingImportanceSection />
+      {/* <PartnersSection /> */}
       <ActivitiesGallerySection />
       <NewsSection />
-      <RecyclersSection />
       <ContactForm />
       <LocationsSection />
     </>

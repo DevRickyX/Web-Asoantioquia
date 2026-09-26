@@ -257,7 +257,7 @@ export function Values() {
                   cada relación que construimos con nuestras comunidades.
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="hidden grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="text-center">
                     <motion.div 
                       initial={{ scale: 0 }}

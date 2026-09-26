@@ -243,7 +243,7 @@ export function Mission() {
                   oportunidad de desarrollo social y económico para las comunidades más vulnerables.
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+                <div className="hidden grid-cols-1 md:grid-cols-3 gap-8 mt-12">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-white mb-2">2018</div>
                     <div className="text-green-200">Año de fundación</div>

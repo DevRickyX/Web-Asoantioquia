@@ -2,10 +2,9 @@ import { motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import { Building2, ArrowRight, Users, Handshake } from 'lucide-react';
 import { partners } from '../services/mockData';
-import { useBackendCollection } from '../services/contentApi';
 
 export function PartnersSection() {
-  const partnerItems = useBackendCollection('/partners', partners);
+  const partnerItems = partners;
   const categoryCount = new Set(partnerItems.map((partner) => partner.category).filter(Boolean)).size;
 
   return (
