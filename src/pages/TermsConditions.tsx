@@ -90,7 +90,7 @@ export function TermsConditions() {
               <h2 className="text-xl font-bold">Contacto para asuntos legales</h2>
               <p className="mt-2 flex flex-wrap items-center gap-2 text-emerald-50/80">
                 <Mail className="h-4 w-4" />
-                info@asoantioquia.org
+                contactenos@asoantioquiaturbo.com
               </p>
             </div>
           </div>

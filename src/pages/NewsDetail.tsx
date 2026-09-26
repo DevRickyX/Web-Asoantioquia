@@ -15,13 +15,11 @@ import {
   X,
 } from 'lucide-react';
 import { news } from '../services/mockData';
-import { useBackendItem } from '../services/contentApi';
 import { renderInlineRichText } from '../utils/richText';
 
 export function NewsDetail() {
   const { slug } = useParams({ strict: false }) as { slug?: string };
-  const fallbackArticle = news.find((item) => item.slug === slug);
-  const article = useBackendItem(slug ? `/news/${slug}` : null, fallbackArticle);
+  const article = news.find((item) => item.slug === slug);
 
   const formatDate = (dateString: string) => {
     const [year, month, day] = dateString.split('-').map(Number);

@@ -2,10 +2,9 @@ import { motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import { Clock, MapPin, Quote } from 'lucide-react';
 import { recyclers } from '../services/mockData';
-import { useBackendCollection } from '../services/contentApi';
 
 export function RecyclersSection() {
-  const testimonials = useBackendCollection('/testimonials', recyclers);
+  const testimonials = recyclers;
 
   return (
     <section className="py-32 relative overflow-hidden">
@@ -75,7 +74,7 @@ export function RecyclersSection() {
                     {recycler.name}
                   </h3>
                   <div className="flex items-center gap-4 text-white/80 text-sm">
-                    <div className="flex items-center">
+                    <div className="hidden items-center">
                       <MapPin className="h-4 w-4 mr-1" />
                       {recycler.location}
                     </div>

@@ -9,24 +9,27 @@ export function Contact() {
       icon: Phone,
       title: "Llámanos Directamente",
       description: "Atención personalizada de lunes a viernes",
-      contact: "+57 (4) 789-1234",
+      contact: "+57 302 311 9180",
       action: "Llamar ahora",
+      href: "tel:+573023119180",
       color: "green",
     },
     {
       icon: MessageCircle,
       title: "WhatsApp Business",
       description: "Respuesta rápida y soporte inmediato",
-      contact: "+57 300 123 4567",
+      contact: "+57 302 311 9180",
       action: "Enviar mensaje",
+      href: "https://wa.me/573023119180",
       color: "blue",
     },
     {
       icon: Mail,
       title: "Correo Electrónico",
       description: "Para consultas detalladas y documentos",
-      contact: "info@asoantioquia.org",
+      contact: "contactenos@asoantioquiaturbo.com",
       action: "Enviar email",
+      href: "mailto:contactenos@asoantioquiaturbo.com",
       color: "purple",
     },
   ];
@@ -182,13 +185,14 @@ export function Contact() {
                       </div>
                     </div>
 
-                    <motion.button
+                    <motion.a
+                      href={method.href}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`w-full bg-gradient-to-r ${colors.gradient} text-white py-3 rounded-2xl font-semibold hover:shadow-lg transition-all duration-300`}
+                      className={`block w-full bg-gradient-to-r ${colors.gradient} text-white py-3 rounded-2xl font-semibold hover:shadow-lg transition-all duration-300`}
                     >
                       {method.action}
-                    </motion.button>
+                    </motion.a>
                   </div>
                 </motion.div>
               );

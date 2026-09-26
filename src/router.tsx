@@ -11,7 +11,6 @@ import { NewsDetail } from './pages/NewsDetail';
 import { TermsConditions } from './pages/TermsConditions';
 import { Locations } from './pages/Locations';
 import { LocationDetail } from './pages/LocationDetail';
-import { AdminDashboard } from './pages/AdminDashboard';
 
 const rootRoute = createRootRoute({
   component: Root,
@@ -83,12 +82,6 @@ const termsConditionsRoute = createRoute({
   component: TermsConditions,
 });
 
-const adminRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/admin',
-  component: AdminDashboard,
-});
-
 const routeTree = rootRoute.addChildren([
   indexRoute,
   missionRoute,
@@ -101,7 +94,6 @@ const routeTree = rootRoute.addChildren([
   locationDetailRoute,
   newsDetailRoute,
   termsConditionsRoute,
-  adminRoute,
 ]);
 
 export const router = createRouter({ routeTree });

@@ -56,7 +56,7 @@ export function Locations() {
           </p>
         </motion.div>
 
-        <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="hidden mt-16 grid-cols-1 gap-6 md:grid-cols-3">
           {[
             { icon: Building2, value: '2', label: 'Sedes activas' },
             { icon: Recycle, value: '12.5K', label: 'Toneladas recuperadas' },
@@ -115,7 +115,7 @@ export function Locations() {
                 <div className="flex h-full flex-col p-7">
                   <p className="text-base leading-7 text-slate-600">{location.summary}</p>
 
-                  <div className="mt-7 grid grid-cols-2 gap-3">
+                  <div className="hidden mt-7 grid-cols-2 gap-3">
                     {location.stats.slice(0, 2).map((stat) => (
                       <div key={stat.label} className="rounded-lg bg-slate-50 p-4">
                         <div className="text-2xl font-bold text-slate-950">{stat.value}</div>
@@ -127,7 +127,7 @@ export function Locations() {
                   </div>
 
                   <div className="mt-7 flex items-center justify-between gap-4 border-t border-slate-100 pt-6">
-                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500">
+                    <span className="hidden items-center gap-2 text-sm font-semibold text-slate-500">
                       <ImageIcon className="h-4 w-4" />
                       {location.gallery.length} fotos
                     </span>

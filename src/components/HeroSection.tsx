@@ -1,27 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Link } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  Leaf,
   Pause,
   Play,
-  Recycle,
-  Users,
 } from 'lucide-react';
 import { heroSlides } from '../services/mockData';
-import { useBackendSetting } from '../services/contentApi';
-
-const heroMetrics = [
-  { icon: Recycle, value: '12.5K', label: 'toneladas recicladas' },
-  { icon: Users, value: '450+', label: 'empleos generados' },
-  { icon: Leaf, value: '25', label: 'comunidades activas' },
-] as const;
 
 export function HeroSection() {
-  const slides = useBackendSetting('hero-slides', heroSlides);
+  const slides = heroSlides;
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
@@ -52,7 +41,7 @@ export function HeroSection() {
   const currentSlide = slides[currentSlideIndex] || heroSlides[0];
 
   return (
-    <section className="relative isolate min-h-[70svh] overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-950 to-emerald-900 md:h-[600px] md:min-h-0">
+    <section className="relative isolate min-h-[70svh] overflow-hidden bg-slate-900 md:h-[600px] md:min-h-0">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlideIndex}
@@ -65,9 +54,9 @@ export function HeroSection() {
           <img
             src={currentSlide.image}
             alt={currentSlide.title}
-            className="h-full w-full object-cover opacity-80"
+            className="h-full w-full object-cover opacity-90"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/80 via-slate-950/62 to-slate-950/25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#102e2c]/85 via-slate-950/55 to-[#8b6b3f]/15" />
         </motion.div>
       </AnimatePresence>
 
@@ -87,7 +76,7 @@ export function HeroSection() {
 
               <h1 className="mt-6 max-w-3xl text-3xl font-bold leading-[1.08] text-white sm:text-5xl lg:text-7xl">
                 {currentSlide.title}
-                <span className="block text-emerald-100">
+                <span className="block text-[#e5dfc9]">
                   {currentSlide.subtitle}
                 </span>
               </h1>
@@ -97,24 +86,24 @@ export function HeroSection() {
               </p>
 
               <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row">
-                <Link
-                  to="/servicios"
-                  className="inline-flex items-center justify-center gap-3 rounded-full bg-emerald-500 px-6 py-3 text-sm font-bold text-white shadow-xl shadow-emerald-950/20 transition-colors duration-200 hover:bg-emerald-600"
+                <a
+                  href="#noticias"
+                  className="inline-flex items-center justify-center gap-3 rounded-full bg-[#d2b06f] px-6 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-slate-950/20 transition-colors duration-200 hover:bg-[#e2c58b]"
                 >
-                  Conocer servicios
+                  Conocer nuestras acciones
                   <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  to="/impacto"
+                </a>
+                <a
+                  href="#por-que-reciclar"
                   className="inline-flex items-center justify-center rounded-full border border-white/60 px-6 py-3 text-sm font-bold text-white transition-colors duration-200 hover:bg-white hover:text-slate-950"
                 >
-                  Ver impacto
-                </Link>
+                  ¿Por qué reciclar?
+                </a>
               </div>
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-10 hidden max-w-3xl grid-cols-1 gap-3 sm:grid sm:grid-cols-3">
+          {/* <div className="mt-10 hidden max-w-3xl grid-cols-1 gap-3 sm:grid sm:grid-cols-3">
             {heroMetrics.map((metric) => {
               const Icon = metric.icon;
 
@@ -133,7 +122,7 @@ export function HeroSection() {
                 </div>
               );
             })}
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -156,7 +145,7 @@ export function HeroSection() {
                 onClick={() => setCurrentSlideIndex(index)}
                 className={`h-2.5 rounded-full transition-all duration-300 ${
                   index === currentSlideIndex
-                    ? 'w-8 bg-emerald-300'
+                    ? 'w-8 bg-[#d2b06f]'
                     : 'w-2.5 bg-white/50 hover:bg-white/75'
                 }`}
                 aria-label={`Ir a ${slide.title}`}

@@ -100,7 +100,7 @@ export function LocationDetail() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-emerald-50 py-16">
+      <section className="hidden relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-emerald-50 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             {location.stats.map((stat, index) => (

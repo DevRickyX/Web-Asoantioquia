@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { companyInfo, type HeroSlide, type NewsItem, type Partner, type Recycler } from './mockData';
 
 export interface ActivityGalleryItem {
@@ -14,34 +13,34 @@ export interface ActivityGalleryItem {
 export const fallbackGalleryItems: ActivityGalleryItem[] = [
   {
     id: 'gallery-001',
-    title: 'Jornadas con recicladores',
-    category: 'Inclusión social',
-    image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1100',
+    title: 'Reconocimiento a recicladores de oficio',
+    category: 'Reconocimiento',
+    image: '/images/noticias/reconocimiento-recicladores-2026/reconocimiento-recicladores-2026-03.jpeg',
     featured: true,
   },
   {
     id: 'gallery-002',
-    title: 'Clasificación de material',
-    category: 'Operación',
-    image: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=900',
+    title: 'Almuerzo comunitario',
+    category: 'Encuentro',
+    image: '/images/noticias/almuerzo-sensibilizacion-recicladores-2026/actividad-almuerzo-sensibilizacion-13.jpeg',
   },
   {
     id: 'gallery-003',
-    title: 'Talleres ambientales',
-    category: 'Educación',
-    image: 'https://images.pexels.com/photos/8348740/pexels-photo-8348740.jpeg?auto=compress&cs=tinysrgb&w=900',
+    title: 'Espacio de sensibilización',
+    category: 'Educación ambiental',
+    image: '/images/noticias/almuerzo-sensibilizacion-recicladores-2026/actividad-almuerzo-sensibilizacion-03.jpeg',
   },
   {
     id: 'gallery-004',
-    title: 'Trabajo comunitario',
-    category: 'Territorio',
-    image: 'https://images.pexels.com/photos/3184297/pexels-photo-3184297.jpeg?auto=compress&cs=tinysrgb&w=900',
+    title: 'Compartir con la comunidad recicladora',
+    category: 'Comunidad',
+    image: '/images/noticias/almuerzo-sensibilizacion-recicladores-2026/actividad-almuerzo-sensibilizacion-07.jpeg',
   },
   {
     id: 'gallery-005',
-    title: 'Alianzas y formación',
-    category: 'Acompañamiento',
-    image: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=900',
+    title: 'Participación de recicladoras de oficio',
+    category: 'Oficio reciclador',
+    image: '/images/noticias/almuerzo-sensibilizacion-recicladores-2026/actividad-almuerzo-sensibilizacion-01.jpeg',
   },
 ];
 
@@ -51,8 +50,6 @@ export interface SiteSetting<T> {
   createdAt?: string;
   updatedAt?: string;
 }
-
-type BackendCollection = NewsItem[] | Recycler[] | ActivityGalleryItem[] | HeroSlide[];
 
 export interface ImpactStat {
   icon: 'Recycle' | 'Users' | 'Building2' | 'Leaf';
@@ -88,111 +85,6 @@ export const defaultImpactStats: ImpactStat[] = [
   },
 ];
 
-export interface LandingMetrics {
-  partners: number;
-  gallery: number;
-  news: number;
-  testimonials: number;
-  stats: ImpactStat[];
-}
-
-type BackendList = BackendCollection | Partner[];
-
-export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:4000';
-
-export async function getJson<T>(path: string): Promise<T> {
-  const response = await fetch(`${apiBaseUrl}/api${path}`);
-
-  if (!response.ok) {
-    throw new Error(`API request failed: ${response.status}`);
-  }
-
-  return response.json() as Promise<T>;
-}
-
-export function useBackendCollection<T extends BackendList>(
-  path: string,
-  fallback: T,
-) {
-  const [items, setItems] = useState<T>(fallback);
-
-  useEffect(() => {
-    let active = true;
-
-    getJson<T>(path)
-      .then((data) => {
-        if (active && Array.isArray(data) && data.length > 0) {
-          setItems(data);
-        }
-      })
-      .catch(() => {
-        if (active) setItems(fallback);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [fallback, path]);
-
-  return items;
-}
-
-export function useBackendItem<T>(
-  path: string | null,
-  fallback: T | undefined,
-) {
-  const [item, setItem] = useState<T | undefined>(fallback);
-
-  useEffect(() => {
-    let active = true;
-
-    if (!path) {
-      setItem(fallback);
-      return () => {
-        active = false;
-      };
-    }
-
-    getJson<T>(path)
-      .then((data) => {
-        if (active) setItem(data);
-      })
-      .catch(() => {
-        if (active) setItem(fallback);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [fallback, path]);
-
-  return item;
-}
-
-export function useBackendSetting<T>(key: string, fallback: T) {
-  const [value, setValue] = useState<T>(fallback);
-
-  useEffect(() => {
-    let active = true;
-
-    getJson<SiteSetting<T>>(`/settings/${key}`)
-      .then((setting) => {
-        if (
-          active &&
-          setting.value &&
-          (!Array.isArray(setting.value) || setting.value.length > 0)
-        ) {
-          setValue(setting.value);
-        }
-      })
-      .catch(() => {
-        if (active) setValue(fallback);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [fallback, key]);
-
-  return value;
-}
+// El contenido del sitio es estatico y vive en el frontend. Estas interfaces y
+// colecciones se mantienen centralizadas para facilitar futuras actualizaciones.
+export type ContentCollection = NewsItem[] | Recycler[] | Partner[] | ActivityGalleryItem[] | HeroSlide[];

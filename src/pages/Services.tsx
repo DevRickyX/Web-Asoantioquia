@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { Truck, Recycle, GraduationCap, FileText, ArrowRight, CheckCircle, Star, Users } from 'lucide-react';
+import { Truck, Recycle, GraduationCap, FileText, ArrowRight, CheckCircle, Star } from 'lucide-react';
 import { services } from '../services/mockData';
 
 const iconMap = {
@@ -14,7 +14,7 @@ export function Services() {
   const serviceFeatures = {
     '1': ['Rutas optimizadas', 'Personal capacitado', 'Horarios flexibles', 'Seguimiento en tiempo real'],
     '2': ['Tecnología avanzada', 'Clasificación técnica', 'Control de calidad', 'Trazabilidad completa'],
-    '3': ['Metodología interactiva', 'Material didáctico', 'Certificación', 'Seguimiento post-capacitación'],
+    '3': ['Conversaciones participativas', 'Orientación sobre separación', 'Prácticas cotidianas', 'Contenidos adaptados'],
     '4': ['Diagnóstico integral', 'Plan personalizado', 'Implementación', 'Monitoreo continuo']
   };
 
@@ -174,14 +174,6 @@ export function Services() {
                           >
                             Solicitar Información
                             <ArrowRight className="ml-2 h-5 w-5" />
-                          </Link>
-                          
-                          <Link
-                            to="/impacto"
-                            className="px-6 py-4 border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center"
-                          >
-                            <Users className="mr-2 h-5 w-5" />
-                            Ver Casos
                           </Link>
                         </div>
                       </motion.div>
