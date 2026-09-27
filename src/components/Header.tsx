@@ -84,7 +84,7 @@ export function Header() {
                 className="h-10 w-10 object-contain"
               />
             </span>
-            <span className="hidden text-xl font-bold leading-tight text-slate-900 sm:block">
+            <span className="block whitespace-nowrap text-sm font-bold leading-tight text-slate-900 sm:text-xl">
               Asoantioquia | Turbo
             </span>
           </Link>
